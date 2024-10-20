@@ -21,7 +21,7 @@ openai.api_key = OPENAI_API_KEY
 llm_client = OpenAI(api_key=OPENAI_API_KEY, model="gpt-4", temperature=0.7)
 
 # Initialize Toolhouse
-th = Toolhouse(access_token=TOOLHOUSE_API_KEY, provider="openai")
+th = Toolhouse(api_key=TOOLHOUSE_API_KEY, provider="openai")
 
 # Load documents and create index
 documents = SimpleDirectoryReader("./data").load_data()
@@ -60,7 +60,7 @@ if prompt := st.chat_input("What do you do?"):
 
         # Make OpenAI chat completion call using the new API (1.0.0+)
         response = openai.chat_completions.create(
-            model="gpt-4",
+            model="gpt-4o-mini",
             messages=messages
         )
 
