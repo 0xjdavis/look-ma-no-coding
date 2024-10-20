@@ -1,6 +1,7 @@
 import streamlit as st
-from llama_index import VectorStoreIndex, SimpleDirectoryReader, ServiceContext
-from llama_index.llms import OpenAI
+import llama_index
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, ServiceContext
+from llama_index.llms.openai import OpenAI
 from llama_index.memory import ChatMemoryBuffer
 import os
 
