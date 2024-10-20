@@ -4,7 +4,10 @@ from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, ServiceCon
 from llama_index.llms.openai import OpenAI
 import toolhouse  # Import Toolhouse
 
-# Set up OpenAI API key
+
+# Set up TOOLHOUSE API Key
+TOOLHOUSE_API_KEY = st.secrets["TOOLHOUSE_API_KEY"]
+# Set up OpenAI API Key
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 
 # Load documents (you would replace this with your own fantasy world data)
@@ -70,4 +73,4 @@ if prompt := st.chat_input("What do you do?"):
 st.sidebar.title("Game Information")
 st.sidebar.info("This is an AI-powered Dungeon Master. Describe your actions, and the AI will respond with the next part of your adventure. Enjoy your journey!")
 
-print("Streamlit app is ready to run!")
+st.write("Streamlit app is ready to run!")
