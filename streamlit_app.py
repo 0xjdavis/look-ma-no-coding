@@ -1,6 +1,6 @@
 import streamlit as st
 import llama_index
-from llama_index import VectorStoreIndex, SimpleDirectoryReader
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
 from llama_index.llms.openai import OpenAI
 from toolhouse import Toolhouse
 
