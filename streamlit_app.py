@@ -1,7 +1,7 @@
 import streamlit as st
 import openai
 import llama_index
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
+from llama_index import VectorStoreIndex, SimpleDirectoryReader
 from llama_index.llms.openai import OpenAI
 from toolhouse import Toolhouse
 
@@ -21,7 +21,7 @@ openai.api_key = OPENAI_API_KEY
 llm_client = OpenAI(api_key=OPENAI_API_KEY, model="gpt-4", temperature=0.7)
 
 # Initialize Toolhouse
-th = Toolhouse(api_key=TOOLHOUSE_API_KEY, provider="openai")
+th = Toolhouse(access_token=TOOLHOUSE_API_KEY, provider="openai")
 
 # Load documents and create index
 documents = SimpleDirectoryReader("./data").load_data()
@@ -58,9 +58,9 @@ if prompt := st.chat_input("What do you do?"):
         # Get tools from Toolhouse
         tools = th.get_tools()
 
-        # Make OpenAI chat completion call using the new API (1.0.0+)
-        response = openai.chat_completions.create(
-            model="gpt-4o-mini",
+        # Make OpenAI completion call using the new API (1.0.0+)
+        response = openai.completions.create(
+            model="gpt-4",
             messages=messages
         )
 
@@ -69,7 +69,7 @@ if prompt := st.chat_input("What do you do?"):
             response = th.run_tools(response)
 
         # Extract assistant response
-        assistant_response = response.choices[0].message["content"]
+        assistant_response = response.choices[0]["message"]["content"]
         st.session_state.messages.append({"role": "assistant", "content": assistant_response})
 
         # Display assistant response
