@@ -1,8 +1,8 @@
 import streamlit as st
-from llama_index import VectorStoreIndex, SimpleDirectoryReader, ServiceContext
-from llama_index.llms import OpenAI
-import os
-from toolhouse import memory_store, memory_fetch
+import llama_index
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, ServiceContext
+from llama_index.llms.openai import OpenAI
+from toolhouse import Toolhouse, memory_store, memory_fetch
 
 # Set up OpenAI API key
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
