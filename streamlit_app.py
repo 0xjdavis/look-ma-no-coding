@@ -1,17 +1,17 @@
 import streamlit as st
-import llama_index
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, ServiceContext
-from llama_index.llms.openai import OpenAI
-import toolhouse  # Import Toolhouse
+from llama_index import VectorStoreIndex, SimpleDirectoryReader, ServiceContext
+from llama_index.llms import OpenAI
+import os
+from toolhouse import memory_store, memory_fetch
 
-
-# Set up TOOLHOUSE API Key
-TOOLHOUSE_API_KEY = st.secrets["TOOLHOUSE_API_KEY"]
-# Set up OpenAI API Key
+# Set up OpenAI API key
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 
+# Toolhouse API key (should be stored securely, e.g., as an environment variable)
+TOOLHOUSE_API_KEY = st.secrets["TOOLHOUSE_API_KEY"]
+
 # Load documents (you would replace this with your own fantasy world data)
-documents = SimpleDirectoryReader("path_to_your_fantasy_world_data").load_data()
+documents = SimpleDirectoryReader("./data").load_data()
 
 # Create index
 service_context = ServiceContext.from_defaults(llm=OpenAI(model="gpt-3.5-turbo", temperature=0.7))
@@ -30,11 +30,11 @@ chat_engine = index.as_chat_engine(
 # Function to store memory using Toolhouse memory_store
 def store_memory(message):
     memory_to_store = f"User: {message['user']}\nAssistant: {message['assistant']}"
-    toolhouse.memory_store(memory=memory_to_store)
+    memory_store(api_key=TOOLHOUSE_API_KEY, memory=memory_to_store)
 
 # Function to fetch memory using Toolhouse memory_fetch
 def fetch_memory():
-    return toolhouse.memory_fetch()
+    return memory_fetch(api_key=TOOLHOUSE_API_KEY)
 
 st.title("AI Dungeon Master")
 
