@@ -15,7 +15,7 @@ th = Toolhouse(access_token=TOOLHOUSE_API_KEY, provider="openai")
 
 MODEL = 'gpt-3.5-turbo'
 
-documents = SimpleDirectoryReader("/data").load_data()
+documents = SimpleDirectoryReader("./data").load_data()
 service_context = ServiceContext.from_defaults(llm=OpenAI(model="gpt-3.5-turbo", temperature=0.7))
 index = VectorStoreIndex.from_documents(documents, service_context=service_context)
 chat_engine = index.as_chat_engine(chat_mode="context")
