@@ -1,7 +1,9 @@
 import streamlit as st
-from llama_index import VectorStoreIndex, SimpleDirectoryReader, ServiceContext
-from llama_index.llms import OpenAI as LlamaOpenAI
-from openai import OpenAI
+import llama_index
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, ServiceContext
+from llama_index.llms.openai import OpenAI as OpenAI
+
+#from openai import OpenAI
 from toolhouse import Toolhouse
 
 # Set up API keys
@@ -14,7 +16,7 @@ th = Toolhouse(access_token=TOOLHOUSE_API_KEY, provider="openai")
 MODEL = 'gpt-3.5-turbo'
 
 documents = SimpleDirectoryReader("path_to_your_fantasy_world_data").load_data()
-service_context = ServiceContext.from_defaults(llm=LlamaOpenAI(model="gpt-3.5-turbo", temperature=0.7))
+service_context = ServiceContext.from_defaults(llm=OpenAI(model="gpt-3.5-turbo", temperature=0.7))
 index = VectorStoreIndex.from_documents(documents, service_context=service_context)
 chat_engine = index.as_chat_engine(chat_mode="context")
 
