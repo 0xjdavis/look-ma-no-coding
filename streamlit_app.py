@@ -1,4 +1,5 @@
 import streamlit as st
+import openai
 import llama_index
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
 from llama_index.llms.openai import OpenAI
@@ -13,8 +14,11 @@ if not OPENAI_API_KEY or not TOOLHOUSE_API_KEY:
     st.error("API keys are missing. Please check your configuration.")
     st.stop()
 
-# Initialize OpenAI client and Toolhouse
+# Initialize OpenAI client directly using the OpenAI Python library
+openai.api_key = OPENAI_API_KEY
 llm_client = OpenAI(api_key=OPENAI_API_KEY, model="gpt-4", temperature=0.7)
+
+# Initialize Toolhouse
 th = Toolhouse(access_token=TOOLHOUSE_API_KEY, provider="openai")
 
 # Load documents and create index
@@ -47,11 +51,16 @@ if prompt := st.chat_input("What do you do?"):
     messages.extend(st.session_state.messages)
 
     try:
-        # Get tools from Toolhouse and make OpenAI chat completion call
+        # Get tools from Toolhouse
         tools = th.get_tools()
-        response = llm_client.chat_completion(messages=messages, tools=tools)
 
-        # Update messages and run tools, if applicable
+        # Make OpenAI chat completion call
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=messages
+        )
+
+        # Run tools, if applicable
         if tools:
             response = th.run_tools(response)
 
