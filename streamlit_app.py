@@ -10,7 +10,7 @@ from toolhouse import Toolhouse
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 TOOLHOUSE_API_KEY = st.secrets["TOOLHOUSE_API_KEY"]
 
-client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+client = OpenAI(api_key=OPENAI_API_KEY)
 th = Toolhouse(access_token=TOOLHOUSE_API_KEY, provider="openai")
 
 MODEL = 'gpt-3.5-turbo'
