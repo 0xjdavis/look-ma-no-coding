@@ -3,4 +3,3 @@ toolhouse
 llama_index
 llama_index.core 
 llama_index.llms.openai
-llama_index.memory
