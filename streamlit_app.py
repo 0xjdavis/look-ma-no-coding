@@ -1,7 +1,7 @@
 import streamlit as st
 import openai
 import llama_index
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
+from llama_index import VectorStoreIndex, SimpleDirectoryReader
 from llama_index.llms.openai import OpenAI
 from toolhouse import Toolhouse
 
@@ -48,24 +48,20 @@ if prompt := st.chat_input("What do you do?"):
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # Prepare conversation context by concatenating all messages
-    conversation = "\n".join([f'{msg["role"]}: {msg["content"]}' for msg in st.session_state.messages])
-
-    # Create the full prompt for OpenAI
-    full_prompt = (
-        "You are an AI Dungeon Master. Create an engaging and dynamic fantasy adventure "
-        "based on the player's input. Be creative, descriptive, and adapt the story based on "
-        "the player's choices. Ensure a balance of narrative, dialogue, and action.\n\n" + conversation
-    )
+    # Prepare conversation context by creating a list of role-message dictionaries
+    messages = [
+        {"role": "system", "content": "You are an AI Dungeon Master. Create an engaging and dynamic fantasy adventure based on the player's input. Be creative, descriptive, and adapt the story based on the player's choices. Ensure a balance of narrative, dialogue, and action."}
+    ]
+    messages.extend(st.session_state.messages)
 
     try:
         # Get tools from Toolhouse
         tools = th.get_tools()
 
-        # Make OpenAI completion call using the new API (1.0.0+)
-        response = openai.completions.create(
+        # Make OpenAI chat completion call using the correct endpoint for chat models
+        response = openai.ChatCompletion.create(
             model="gpt-4",
-            prompt=full_prompt
+            messages=messages
         )
 
         # Run tools, if applicable
@@ -73,7 +69,7 @@ if prompt := st.chat_input("What do you do?"):
             response = th.run_tools(response)
 
         # Extract assistant response
-        assistant_response = response.choices[0]["text"]
+        assistant_response = response.choices[0]["message"]["content"]
         st.session_state.messages.append({"role": "assistant", "content": assistant_response})
 
         # Display assistant response
