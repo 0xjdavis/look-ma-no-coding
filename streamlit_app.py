@@ -14,8 +14,10 @@ if not OPENAI_API_KEY or not TOOLHOUSE_API_KEY:
     st.error("API keys are missing. Please check your configuration.")
     st.stop()
 
-# Initialize OpenAI client directly using the OpenAI Python library
+# Initialize OpenAI client directly using the OpenAI Python library (1.0.0+ syntax)
 openai.api_key = OPENAI_API_KEY
+
+# Initialize LlamaIndex OpenAI client for the LLM
 llm_client = OpenAI(api_key=OPENAI_API_KEY, model="gpt-4", temperature=0.7)
 
 # Initialize Toolhouse
@@ -47,15 +49,17 @@ if prompt := st.chat_input("What do you do?"):
         st.markdown(prompt)
 
     # Prepare conversation context
-    messages = [{"role": "system", "content": "You are an AI Dungeon Master. Create an engaging and dynamic fantasy adventure based on the player's input. Be creative, descriptive, and adapt the story based on the player's choices."}]
+    messages = [
+        {"role": "system", "content": "You are an AI Dungeon Master. Create an engaging and dynamic fantasy adventure based on the player's input. Be creative, descriptive, and adapt the story based on the player's choices."}
+    ]
     messages.extend(st.session_state.messages)
 
     try:
         # Get tools from Toolhouse
         tools = th.get_tools()
 
-        # Make OpenAI chat completion call
-        response = openai.ChatCompletion.create(
+        # Make OpenAI chat completion call using the new API (1.0.0+)
+        response = openai.chat_completions.create(
             model="gpt-4",
             messages=messages
         )
@@ -65,7 +69,7 @@ if prompt := st.chat_input("What do you do?"):
             response = th.run_tools(response)
 
         # Extract assistant response
-        assistant_response = response["choices"][0]["message"]["content"]
+        assistant_response = response.choices[0].message["content"]
         st.session_state.messages.append({"role": "assistant", "content": assistant_response})
 
         # Display assistant response
