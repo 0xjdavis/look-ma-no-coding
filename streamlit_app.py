@@ -9,11 +9,11 @@ OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Define the OpenAI model
-MODEL = 'gpt-4'  # Adjust this to the appropriate model
+MODEL = 'gpt-4'
 
 # Function to generate the PROMPT based on current form values
 def generate_prompt():
-    return f"""You are a Dungeon Master in a D&D-style adventure game. The player's character is defined as {st.session_state.Class} named {st.session_state.Name} with {st.session_state.Skills} skills and {st.session_state.Inventory}. Guide the player through the story, prompting them to take actions.
+    return f"""You are a Dungeon Master in a D&D-style adventure game. The player's character is {st.session_state.Class} named {st.session_state.Name} with {st.session_state.Skills} skills and {st.session_state.Inventory}. Guide the player through the story, prompting them to take actions.
 
 When presenting action choices to the player, format them as a numbered list like this:
 Player action:
@@ -21,18 +21,7 @@ Player action:
 2. [Second action option]
 3. [Third action option]
 
-Provide 2-4 options for each action prompt. The player will respond with their chosen action.
-
-When a situation requires a skill check or an action with uncertain outcome, explicitly ask the player to roll a d6 (six-sided die). Format your request for a dice roll as follows: '[ROLL THE DICE: reason for rolling]' For example: '[ROLL THE DICE: to see if you successfully track the creature]'
-
-After the player rolls, interpret the result as follows:
-1-2 = Failure
-3-4 = Partial success
-5-6 = Complete success
-
-Wait for the player's roll or action choice before continuing the story.
-
-At the end of each response, provide a brief description (1-2 sentences) of the current scene or action for image generation. Format it as: [IMAGE: description for image generation]"""
+Provide 2-4 options for each action prompt. Ask the player to roll a d6 for skill checks, and at the end of each response, provide a brief description for image generation as: [IMAGE: description]."""
 
 # Initialize session state
 if 'game_state' not in st.session_state:
@@ -59,10 +48,7 @@ def update_game():
         })
         ai_message = get_ai_response(st.session_state.messages)
         st.session_state.messages.append({"role": "assistant", "content": ai_message})
-        image_data = generate_and_display_image(ai_message)
-        if image_data:
-            st.write(image_data['image_url'])  # Debugging step: print image URL
-            st.session_state.current_image = image_data['image_url']
+        generate_and_display_image(ai_message)
 
 # Sidebar form
 st.sidebar.title("Create your character")
@@ -90,7 +76,7 @@ def get_ai_response(messages):
 # Function to generate image using DALL-E
 def generate_image(prompt):
     try:
-        full_prompt = f"Create a Fantastic D&D story image in the stylings of artists Virgil Finley, Frank Frazetta, and Ralph Bakshi: {prompt}"
+        full_prompt = f"A high-quality fantasy image: {prompt}"
         response = client.images.generate(
             model="dall-e-3",
             prompt=full_prompt,
@@ -105,16 +91,19 @@ def generate_image(prompt):
 
 # Function to generate and display image
 def generate_and_display_image(message):
-    image_prompt = message.split("[IMAGE:")[-1].split("]")[0].strip()
-    image_url = generate_image(image_prompt)
-    if image_url:
-        return {
-            "image_url": image_url,
-            "image_prompt": image_prompt
-        }
+    if "[IMAGE:" in message:
+        try:
+            image_prompt = message.split("[IMAGE:")[-1].split("]")[0].strip()
+            image_url = generate_image(image_prompt)
+            if image_url:
+                st.session_state.current_image = image_url
+                st.image(image_url, use_column_width=True)
+            else:
+                st.error("Failed to generate an image. Please try again later.")
+        except Exception as e:
+            st.error(f"Image prompt extraction failed: {str(e)}")
     else:
-        st.error("Failed to generate an image. Please try again later.")
-    return None
+        st.error("No valid image prompt found.")
 
 # Function to display chat history
 def display_chat_history():
@@ -146,10 +135,7 @@ if st.session_state.game_state == "not_started":
         })
         ai_message = get_ai_response(st.session_state.messages)
         st.session_state.messages.append({"role": "assistant", "content": ai_message})
-        image_data = generate_and_display_image(ai_message)
-        if image_data:
-            st.write(image_data['image_url'])  # Debugging step: print image URL
-            st.session_state.current_image = image_data['image_url']
+        generate_and_display_image(ai_message)
         st.rerun()
 
 # Main game loop
@@ -164,10 +150,7 @@ if st.session_state.game_state == "playing":
             st.session_state.messages.append({"role": "user", "content": roll_message})
             ai_message = get_ai_response(st.session_state.messages)
             st.session_state.messages.append({"role": "assistant", "content": ai_message})
-            image_data = generate_and_display_image(ai_message)
-            if image_data:
-                st.write(image_data['image_url'])  # Debugging step: print image URL
-                st.session_state.current_image = image_data['image_url']
+            generate_and_display_image(ai_message)
             st.rerun()
     else:
         # User input
@@ -176,12 +159,5 @@ if st.session_state.game_state == "playing":
             st.session_state.messages.append({"role": "user", "content": user_input})
             ai_message = get_ai_response(st.session_state.messages)
             st.session_state.messages.append({"role": "assistant", "content": ai_message})
-            image_data = generate_and_display_image(ai_message)
-            if image_data:
-                st.write(image_data['image_url'])  # Debugging step: print image URL
-                st.session_state.current_image = image_data['image_url']
+            generate_and_display_image(ai_message)
             st.rerun()
-
-# Run the Streamlit app
-if __name__ == "__main__":
-    st.empty()  # This line is here to trigger a rerun when the state changes
