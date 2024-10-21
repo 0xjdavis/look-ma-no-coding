@@ -87,7 +87,7 @@ def generate_image(prompt):
         return response.data[0].url
     except Exception as e:
         st.error(f"An error occurred while generating the image: {str(e)}")
-        time.sleep(5) 
+        #time.sleep(5) 
         return None
 
 # Function to extract and display image
@@ -119,6 +119,7 @@ def read_story_aloud(text):
         tts.write_to_fp(mp3_fp)
         mp3_fp.seek(0)
         st.audio(mp3_fp, format="audio/mp3")
+        st.write(mp3_fp)
     except Exception as e:
         st.error(f"An error occurred while generating audio: {str(e)}")
 
