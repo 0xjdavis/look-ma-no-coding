@@ -3,6 +3,7 @@ import random
 from openai import OpenAI
 import time
 import pyttsx3  # New import for offline TTS
+import eSpeak-ng
 
 # Set API Keys (using st.secrets for Streamlit)
 try:
