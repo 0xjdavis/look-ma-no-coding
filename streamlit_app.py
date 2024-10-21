@@ -9,7 +9,7 @@ TOOLHOUSE_API_KEY = st.secrets["TOOLHOUSE_API_KEY"]
 # Please remember to use a safer system to store your API KEYS 
 # after finishing the quick start.
 client = OpenAI(api_key=OPENAI_API_KEY)
-th = Toolhouse(access_token=TOOLHOUSE_API_KEY, provider="openai")
+th = Toolhouse(api_key=TOOLHOUSE_API_KEY, provider="openai")
 th.set_metadata("id", "10566")
 th.set_metadata("timezone", -8)
 
