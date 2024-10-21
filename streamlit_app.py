@@ -1,6 +1,5 @@
-import os
+import streamlit as st
 from typing import List
-# 👋 Make sure you've also installed the OpenAI SDK through: pip install openai
 from openai import OpenAI
 from toolhouse import Toolhouse
 
