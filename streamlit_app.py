@@ -26,13 +26,12 @@ st.sidebar.text("Do you have any special items or weapons?")
 Inventory = st.sidebar.text_input("Inventory", "1 Bow, Quiver of 40 arrows")
 
 
-
 # Initialize session state
 if 'game_state' not in st.session_state:
     st.session_state.game_state = "not_started"
     st.session_state.messages = [{
         "role": "system",
-        "content": """You are a Dungeon Master in a D&D-style adventure game. The player's character is defined as """ Class """ named """Name""" with """Skills""" skills and """Inventory""". Guide the player through the story, prompting them to take actions and roll dice when necessary. Use a d6 (six-sided die) for all rolls."
+        "content": """You are a Dungeon Master in a D&D-style adventure game. The player's character is defined as """ Class """ named """Name""" with """Skills""" skills and """Inventory""". Guide the player through the story, prompting them to take actions and roll dice when necessary. Use a d6 (six-sided die) for all rolls."""
     }]
 
 # Function to roll a d6
