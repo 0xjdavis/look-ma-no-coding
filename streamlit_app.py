@@ -61,6 +61,7 @@ def update_game():
         st.session_state.messages.append({"role": "assistant", "content": ai_message})
         image_data = generate_and_display_image(ai_message)
         if image_data:
+            st.write(image_data['image_url'])  # Debugging step: print image URL
             st.session_state.current_image = image_data['image_url']
 
 # Sidebar form
@@ -89,12 +90,11 @@ def get_ai_response(messages):
 # Function to generate image using DALL-E
 def generate_image(prompt):
     try:
-        full_prompt = f"Create a Fantastic D&D story image in the stylings of artists Virgil Finley, Frank Frazetta, and Ralph Bhakshi: {prompt}"
+        full_prompt = f"Create a Fantastic D&D story image in the stylings of artists Virgil Finley, Frank Frazetta, and Ralph Bakshi: {prompt}"
         response = client.images.generate(
             model="dall-e-3",
             prompt=full_prompt,
             size="1024x768",
-            quality="standard",
             n=1,
         )
         image_url = response.data[0].url
@@ -112,6 +112,8 @@ def generate_and_display_image(message):
             "image_url": image_url,
             "image_prompt": image_prompt
         }
+    else:
+        st.error("Failed to generate an image. Please try again later.")
     return None
 
 # Function to display chat history
@@ -140,12 +142,13 @@ if st.session_state.game_state == "not_started":
         st.session_state.messages = [{"role": "system", "content": initial_prompt}]
         st.session_state.messages.append({
             "role": "user",
-            "content": "Start us off with a new adventure Dungeon Master. Introduce the setting."
+            "content": "Start a new adventure game. Introduce the setting."
         })
         ai_message = get_ai_response(st.session_state.messages)
         st.session_state.messages.append({"role": "assistant", "content": ai_message})
         image_data = generate_and_display_image(ai_message)
         if image_data:
+            st.write(image_data['image_url'])  # Debugging step: print image URL
             st.session_state.current_image = image_data['image_url']
         st.rerun()
 
@@ -163,6 +166,7 @@ if st.session_state.game_state == "playing":
             st.session_state.messages.append({"role": "assistant", "content": ai_message})
             image_data = generate_and_display_image(ai_message)
             if image_data:
+                st.write(image_data['image_url'])  # Debugging step: print image URL
                 st.session_state.current_image = image_data['image_url']
             st.rerun()
     else:
@@ -174,6 +178,7 @@ if st.session_state.game_state == "playing":
             st.session_state.messages.append({"role": "assistant", "content": ai_message})
             image_data = generate_and_display_image(ai_message)
             if image_data:
+                st.write(image_data['image_url'])  # Debugging step: print image URL
                 st.session_state.current_image = image_data['image_url']
             st.rerun()
 
