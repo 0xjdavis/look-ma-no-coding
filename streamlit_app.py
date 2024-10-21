@@ -21,7 +21,7 @@ Class = st.sidebar.text_input("Class", "Hunter")
 Skills = st.sidebar.text_input("Skills", "tracking, animal handling")
 Inventory = st.sidebar.text_input("Inventory", "1 Bow, Quiver of 40 arrows")
 
-PROMPT = f"You are a Dungeon Master in a D&D-style adventure game. The player's character is defined as {Class} named {Name} with {Skills} skills and {Inventory}. Guide the player through the story, prompting them to take actions and roll dice when necessary. Use a d6 (six-sided die) for all rolls."
+PROMPT = f"You are a Dungeon Master in a D&D-style adventure game. Guide the player through the story, prompting them to take actions and roll dice when necessary. Use a d6 (six-sided die) for all rolls."
 
 # Initialize session state
 if 'game_state' not in st.session_state:
@@ -58,7 +58,7 @@ if st.session_state.game_state == "not_started":
         st.session_state.game_state = "playing"
         st.session_state.messages.append({
             "role": "user",
-            "content": "Start a new adventure game. Introduce the setting."
+            "content": "Start a new adventure game. Introduce the setting. The player's character will be defined as {Class} named {Name} with {Skills} skills and {Inventory}. "
         })
         ai_message = get_ai_response(st.session_state.messages)
         st.session_state.messages.append({"role": "assistant", "content": ai_message})
