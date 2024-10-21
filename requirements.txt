@@ -5,4 +5,4 @@ llama_index.core
 llama_index.llms.openai
 openai
 pyttsx3
-eSpeak
+python-eSpeak
