@@ -140,7 +140,7 @@ if st.session_state.game_state == "not_started":
         st.session_state.messages = [{"role": "system", "content": initial_prompt}]
         st.session_state.messages.append({
             "role": "user",
-            "content": "Start a new adventure game. Introduce the setting."
+            "content": "Start us off with a new adventure Dungeon Master. Introduce the setting."
         })
         ai_message = get_ai_response(st.session_state.messages)
         st.session_state.messages.append({"role": "assistant", "content": ai_message})
