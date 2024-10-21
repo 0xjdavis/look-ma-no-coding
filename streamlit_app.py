@@ -1,8 +1,6 @@
 import streamlit as st
 import random
-import time
 from openai import OpenAI
-import json
 
 # Set API Keys (using st.secrets for Streamlit)
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
@@ -49,27 +47,12 @@ if 'Name' not in st.session_state:
     st.session_state.Skills = "tracking, animal handling"
     st.session_state.Inventory = "1 Bow, Quiver of 40 arrows"
 
-# Function to update game with new character details
-def update_game():
-    if st.session_state.game_state == "playing":
-        new_prompt = generate_prompt()
-        st.session_state.messages[0] = {"role": "system", "content": new_prompt}
-        st.session_state.messages.append({
-            "role": "system",
-            "content": "The player has updated their character. Please acknowledge the changes and continue the story."
-        })
-        ai_message = get_ai_response(st.session_state.messages)
-        st.session_state.messages.append({"role": "assistant", "content": ai_message})
-        image_data = generate_and_display_image(ai_message)
-        if image_data:
-            st.session_state.current_image = image_data['image_url']
-
 # Sidebar form
 st.sidebar.title("Create your character")
-st.session_state.Name = st.sidebar.text_input("Name", st.session_state.Name, on_change=update_game)
-st.session_state.Class = st.sidebar.text_input("Class", st.session_state.Class, on_change=update_game)
-st.session_state.Skills = st.sidebar.text_input("Skills", st.session_state.Skills, on_change=update_game)
-st.session_state.Inventory = st.sidebar.text_input("Inventory", st.session_state.Inventory, on_change=update_game)
+st.session_state.Name = st.sidebar.text_input("Name", st.session_state.Name)
+st.session_state.Class = st.sidebar.text_input("Class", st.session_state.Class)
+st.session_state.Skills = st.sidebar.text_input("Skills", st.session_state.Skills)
+st.session_state.Inventory = st.sidebar.text_input("Inventory", st.session_state.Inventory)
 
 # Function to roll a d6
 def roll_d6():
@@ -96,45 +79,40 @@ def generate_image(prompt):
             model="dall-e-3",
             prompt=full_prompt,
             size="1024x768",
-            quality="standard",
-            n=1,
+            n=1
         )
-        image_url = response.data[0].url
-        return image_url
+        return response.data[0].url
     except Exception as e:
         st.error(f"An error occurred while generating the image: {str(e)}")
         return None
 
-# Function to generate and display image
+# Function to extract and display image
 def generate_and_display_image(message):
     if "[IMAGE:" in message:
         try:
             # Extract the image prompt from the message
             image_prompt = message.split("[IMAGE:")[-1].split("]")[0].strip()
             
-            # Log the extracted prompt to debug
+            # Log the extracted prompt for debugging
             st.write(f"Extracted Image Prompt: {image_prompt}")
             
-            # Ensure the prompt is not empty before sending to DALL-E
             if image_prompt:
                 image_url = generate_image(image_prompt)
                 
-                # Log and display the generated image if available
+                # Check if the image was successfully generated
                 if image_url:
                     st.session_state.current_image = image_url
                     st.image(image_url, caption=image_url, use_column_width=True)
-                    st.write(f"Generated Image URL: {image_url}")  # Log the image URL for debugging
+                    st.write(f"Generated Image URL: {image_url}")
                 else:
-                    st.error("Failed to generate an image. Please try again later.")
+                    st.error("Failed to generate an image. Please try again.")
             else:
-                st.error("The image prompt is empty. No valid prompt to generate the image.")
+                st.error("No valid image prompt found.")
         except Exception as e:
-            st.error(f"Image generation failed: {str(e)}")
-            st.write(f"Error details: {str(e)}")
-    else:
-        st.error("No valid image prompt found.")
+            st.error(f"Error generating image: {str(e)}")
+            st.write(f"Details: {str(e)}")
 
-# Function to display chat history
+# Display chat history
 def display_chat_history():
     for message in st.session_state.messages:
         if message["role"] != "system":
@@ -164,9 +142,7 @@ if st.session_state.game_state == "not_started":
         })
         ai_message = get_ai_response(st.session_state.messages)
         st.session_state.messages.append({"role": "assistant", "content": ai_message})
-        image_data = generate_and_display_image(ai_message)
-        if image_data:
-            st.session_state.current_image = image_data['image_url']
+        generate_and_display_image(ai_message)
         st.rerun()
 
 # Main game loop
@@ -181,9 +157,7 @@ if st.session_state.game_state == "playing":
             st.session_state.messages.append({"role": "user", "content": roll_message})
             ai_message = get_ai_response(st.session_state.messages)
             st.session_state.messages.append({"role": "assistant", "content": ai_message})
-            image_data = generate_and_display_image(ai_message)
-            if image_data:
-                st.session_state.current_image = image_data['image_url']
+            generate_and_display_image(ai_message)
             st.rerun()
     else:
         # User input
@@ -192,7 +166,5 @@ if st.session_state.game_state == "playing":
             st.session_state.messages.append({"role": "user", "content": user_input})
             ai_message = get_ai_response(st.session_state.messages)
             st.session_state.messages.append({"role": "assistant", "content": ai_message})
-            image_data = generate_and_display_image(ai_message)
-            if image_data:
-                st.session_state.current_image = image_data['image_url']
+            generate_and_display_image(ai_message)
             st.rerun()
