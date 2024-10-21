@@ -72,6 +72,7 @@ def get_ai_response(messages):
         return response.choices[0].message.content
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
+        time.sleep(5)
         return "I apologize, but I'm having trouble connecting to the AI service that makes this fantasy possible. Maybe you should go outside."
 
 # Function to generate image using DALL-E
@@ -132,6 +133,7 @@ def read_story_aloud(text):
             st.audio(audio_bytes, format="audio/mp3")
     except Exception as e:
         st.error(f"An error occurred while generating or playing audio: {str(e)}")
+        time.sleep(5)
 
 # Display chat history
 def display_chat_history():
