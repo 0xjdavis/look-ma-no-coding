@@ -72,7 +72,7 @@ def get_ai_response(messages):
         return response.choices[0].message.content
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
-        return "I apologize, but I'm having trouble connecting to the AI service at the moment. Please try again later."
+        return "I apologize, but I'm having trouble connecting to the AI service that makes this fantasy possible. Maybe you should go outside."
 
 # Function to generate image using DALL-E
 def generate_image(prompt):
