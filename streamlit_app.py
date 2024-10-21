@@ -2,22 +2,16 @@ import streamlit as st
 import random
 from openai import OpenAI
 import time
-import pyttsx3  # Offline text-to-speech engine that works cross-platform
+from gtts import gTTS  # Google Text-to-Speech
+from io import BytesIO
 
 # Set API Keys (using st.secrets for Streamlit)
-try:
-    OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
-except KeyError:
-    st.error("Missing OpenAI API key in Streamlit secrets.")
-    st.stop()
+OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Define the OpenAI model
 MODEL = 'gpt-4'
-
-# Initialize the TTS engine for pyttsx3 (this works without requiring eSpeak or extra installations)
-engine = pyttsx3.init()
 
 # Function to generate the PROMPT based on current form values
 def generate_prompt():
@@ -117,11 +111,14 @@ def generate_and_display_image(message):
         except Exception as e:
             st.error(f"Error generating image: {str(e)}")
 
-# Function to read the story out loud using pyttsx3 (offline, no external installations needed)
+# Function to read the story out loud using gTTS (Google Text-to-Speech)
 def read_story_aloud(text):
     try:
-        engine.say(text)
-        engine.runAndWait()
+        tts = gTTS(text)
+        mp3_fp = BytesIO()
+        tts.write_to_fp(mp3_fp)
+        mp3_fp.seek(0)
+        st.audio(mp3_fp, format="audio/mp3")
     except Exception as e:
         st.error(f"An error occurred while generating audio: {str(e)}")
 
