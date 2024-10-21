@@ -73,10 +73,14 @@ def get_ai_response(messages):
         st.error(f"An error occurred connecting to OpenAI: {str(e)}")
         return "I apologize, but I'm having trouble connecting to the AI service at the moment. Maybe take a break or check your connection."
 
-# Function to generate image using DALL-E
+# Ensure the directory exists
+if not os.path.exists('data/images'):
+    os.makedirs('data/images')
+
+# Function to generate and save the image locally
 def generate_image(prompt):
     try:
-        full_prompt = f"Create a highly detailed fantasy scene: {prompt}. Include rich, vivid colors, magical elements, and a sense of adventure."
+        full_prompt = f"Create a highly detailed fantasy scene: {prompt}. Include rich, vivid colors, magical elements, and a sense of adventure. Use the artwork stylings of artists Virgil Finley, Frank Frazetta, and Ralph Bakshi as an influence of the images. Create consistant imagery for the entire game. Don't change styles."
         
         response = client.images.generate(
             model="dall-e-3",
@@ -84,10 +88,21 @@ def generate_image(prompt):
             size="1024x1024",
             n=1
         )
-        return response.data[0].url
+        image_url = response.data[0].url
+        
+        # Download the image
+        image_response = requests.get(image_url)
+        if image_response.status_code == 200:
+            # Save the image to /data/images/ directory
+            image_path = f"data/images/{prompt.replace(' ', '_')[:50]}.jpg"
+            with open(image_path, 'wb') as f:
+                f.write(image_response.content)
+            return image_path
+        else:
+            st.error("Failed to download the image.")
+            return None
     except Exception as e:
         st.error(f"An error occurred while generating the image: {str(e)}")
-        #time.sleep(5) 
         return None
 
 # Function to extract and display image
