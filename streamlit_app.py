@@ -98,6 +98,7 @@ def generate_image(prompt):
         )
         image_url = response.data[0].url
         return image_url
+        st.write(image_url)
     except Exception as e:
         st.error(f"An error occurred while generating the image: {str(e)}")
         return None
@@ -138,8 +139,8 @@ if st.session_state.game_state == "not_started":
             "content": "Start a new adventure game. Introduce the setting."
         })
         ai_message = get_ai_response(st.session_state.messages)
-        st.session_state.messages.append({"role": "assistant", "content": ai_message})
         generate_and_display_image(ai_message)
+        st.session_state.messages.append({"role": "assistant", "content": ai_message})
         st.rerun()
 
 # Main game loop
@@ -153,8 +154,8 @@ if st.session_state.game_state == "playing":
             roll_message = f"You rolled a {roll_result}."
             st.session_state.messages.append({"role": "user", "content": roll_message})
             ai_message = get_ai_response(st.session_state.messages)
-            st.session_state.messages.append({"role": "assistant", "content": ai_message})
             generate_and_display_image(ai_message)
+            st.session_state.messages.append({"role": "assistant", "content": ai_message})
             st.rerun()
     else:
         # User input
@@ -162,8 +163,8 @@ if st.session_state.game_state == "playing":
         if user_input:
             st.session_state.messages.append({"role": "user", "content": user_input})
             ai_message = get_ai_response(st.session_state.messages)
-            st.session_state.messages.append({"role": "assistant", "content": ai_message})
             generate_and_display_image(ai_message)
+            st.session_state.messages.append({"role": "assistant", "content": ai_message})
             st.rerun()
 
 # Run the Streamlit app
