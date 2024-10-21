@@ -120,13 +120,15 @@ def generate_and_display_image(message):
 # Function to read the story out loud using gTTS
 def read_story_aloud(text):
     try:
-        tts = gTTS(text)
-        tts.save("story.mp3")
-        audio_file = open("story.mp3", "rb")
-        audio_bytes = audio_file.read()
-        st.audio(audio_bytes, format='audio/mp3')
+        tts = gTTS(text)  # Generate speech from text
+        tts.save("story.mp3")  # Save as an MP3 file
+        
+        # Load and play the audio file
+        with open("story.mp3", "rb") as audio_file:
+            audio_bytes = audio_file.read()
+            st.audio(audio_bytes, format="audio/mp3")
     except Exception as e:
-        st.error(f"An error occurred while generating audio: {str(e)}")
+        st.error(f"An error occurred while generating or playing audio: {str(e)}")
 
 # Display chat history
 def display_chat_history():
