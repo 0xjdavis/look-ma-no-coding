@@ -23,12 +23,7 @@ openai.api_key = OPENAI_API_KEY
 # Initialize LlamaIndex components
 embed_model = OpenAIEmbedding(model="text-embedding-3-small")
 node_parser = SentenceSplitter(chunk_size=512, chunk_overlap=20)
-llm = LlamaOpenAI(model="gpt-3.5-turbo", api_key=OPENAI_API_KEY)
-service_context = Settings.llm(
-    llm=llm,
-    embed_model=embed_model,
-    node_parser=node_parser
-)
+Settings.llm = OpenAI(model="gpt-3.5-turbo", api_key=OPENAI_API_KEY, temperature=0.1)
 
 # Initialize Toolhouse
 th = Toolhouse(access_token=TOOLHOUSE_API_KEY, provider="openai")
@@ -44,6 +39,7 @@ except Exception as e:
 
 # Streamlit UI setup
 st.title("AI Dungeon Master")
+se.caption("Make your move...")
 
 # Initialize session state
 if "messages" not in st.session_state:
