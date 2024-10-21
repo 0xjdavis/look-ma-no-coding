@@ -97,7 +97,8 @@ def generate_and_display_image(message):
             image_url = generate_image(image_prompt)
             if image_url:
                 st.session_state.current_image = image_url
-                st.image(image_url, use_column_width=True)
+                # Corrected: Display image with URL as caption
+                st.image(image_url, caption=image_url)
             else:
                 st.error("Failed to generate an image. Please try again later.")
         except Exception as e:
