@@ -59,8 +59,8 @@ def update_game():
             "content": "The player has updated their character. Please acknowledge the changes and continue the story."
         })
         ai_message = get_ai_response(st.session_state.messages)
-        st.session_state.messages.append({"role": "assistant", "content": ai_message})
         generate_and_display_image(ai_message)
+        st.session_state.messages.append({"role": "assistant", "content": ai_message})
 
 # Sidebar form
 st.sidebar.title("Create your character")
@@ -98,7 +98,6 @@ def generate_image(prompt):
         )
         image_url = response.data[0].url
         return image_url
-        st.write(image_url)
     except Exception as e:
         st.error(f"An error occurred while generating the image: {str(e)}")
         return None
@@ -109,6 +108,7 @@ def generate_and_display_image(message):
     image_url = generate_image(image_prompt)
     if image_url:
         st.session_state.current_image = image_url
+        st.write(image_url)
 
 # Function to display chat history
 def display_chat_history():
