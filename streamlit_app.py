@@ -1,8 +1,7 @@
 import streamlit as st
 import random
 from openai import OpenAI
-import io
-import requests
+import json
 
 # Set API Keys (using st.secrets for Streamlit)
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
@@ -59,8 +58,10 @@ def update_game():
             "content": "The player has updated their character. Please acknowledge the changes and continue the story."
         })
         ai_message = get_ai_response(st.session_state.messages)
-        generate_and_display_image(ai_message)
         st.session_state.messages.append({"role": "assistant", "content": ai_message})
+        image_data = generate_and_display_image(ai_message)
+        if image_data:
+            st.session_state.current_image = image_data['image_url']
 
 # Sidebar form
 st.sidebar.title("Create your character")
@@ -107,8 +108,11 @@ def generate_and_display_image(message):
     image_prompt = message.split("[IMAGE:")[-1].split("]")[0].strip()
     image_url = generate_image(image_prompt)
     if image_url:
-        st.session_state.current_image = image_url
-        st.write(image_url)
+        return {
+            "image_url": image_url,
+            "image_prompt": image_prompt
+        }
+    return None
 
 # Function to display chat history
 def display_chat_history():
@@ -139,8 +143,10 @@ if st.session_state.game_state == "not_started":
             "content": "Start a new adventure game. Introduce the setting."
         })
         ai_message = get_ai_response(st.session_state.messages)
-        generate_and_display_image(ai_message)
         st.session_state.messages.append({"role": "assistant", "content": ai_message})
+        image_data = generate_and_display_image(ai_message)
+        if image_data:
+            st.session_state.current_image = image_data['image_url']
         st.rerun()
 
 # Main game loop
@@ -154,8 +160,10 @@ if st.session_state.game_state == "playing":
             roll_message = f"You rolled a {roll_result}."
             st.session_state.messages.append({"role": "user", "content": roll_message})
             ai_message = get_ai_response(st.session_state.messages)
-            generate_and_display_image(ai_message)
             st.session_state.messages.append({"role": "assistant", "content": ai_message})
+            image_data = generate_and_display_image(ai_message)
+            if image_data:
+                st.session_state.current_image = image_data['image_url']
             st.rerun()
     else:
         # User input
@@ -163,8 +171,10 @@ if st.session_state.game_state == "playing":
         if user_input:
             st.session_state.messages.append({"role": "user", "content": user_input})
             ai_message = get_ai_response(st.session_state.messages)
-            generate_and_display_image(ai_message)
             st.session_state.messages.append({"role": "assistant", "content": ai_message})
+            image_data = generate_and_display_image(ai_message)
+            if image_data:
+                st.session_state.current_image = image_data['image_url']
             st.rerun()
 
 # Run the Streamlit app
