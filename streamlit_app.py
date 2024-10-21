@@ -1,10 +1,11 @@
 import streamlit as st
 import openai
-from llama_index import VectorStoreIndex, SimpleDirectoryReader
+import llama_index
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.node_parser import SentenceSplitter
 from llama_index.llms import OpenAI as LlamaOpenAI
-from llama_index import ServiceContext
+
 from toolhouse import Toolhouse
 
 # Set up API keys
@@ -23,7 +24,7 @@ openai.api_key = OPENAI_API_KEY
 embed_model = OpenAIEmbedding(model="text-embedding-3-small")
 node_parser = SentenceSplitter(chunk_size=512, chunk_overlap=20)
 llm = LlamaOpenAI(model="gpt-3.5-turbo", api_key=OPENAI_API_KEY)
-service_context = ServiceContext.from_defaults(
+service_context = Settings.llm(
     llm=llm,
     embed_model=embed_model,
     node_parser=node_parser
