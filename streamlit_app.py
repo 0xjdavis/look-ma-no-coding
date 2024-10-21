@@ -1,5 +1,6 @@
 import streamlit as st
 import random
+import requests
 from openai import OpenAI
 import time
 from gtts import gTTS  # Google Text-to-Speech
