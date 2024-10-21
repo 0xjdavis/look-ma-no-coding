@@ -1,7 +1,6 @@
 import streamlit as st
 import random
 from openai import OpenAI
-from openai.types.error import APIConnectionError
 import io
 import requests
 
@@ -82,27 +81,32 @@ def get_ai_response(messages):
             messages=messages
         )
         return response.choices[0].message.content
-    except APIConnectionError:
-        st.error("Unable to connect to the AI service. Please try again later.")
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
         return "I apologize, but I'm having trouble connecting to the AI service at the moment. Please try again later."
 
 # Function to generate image using DALL-E
 def generate_image(prompt):
-    response = client.images.generate(
-        model="dall-e-3",
-        prompt=prompt,
-        size="1024x768",
-        quality="standard",
-        n=1,
-    )
-    image_url = response.data[0].url
-    return image_url
+    try:
+        response = client.images.generate(
+            model="dall-e-3",
+            prompt=prompt,
+            size="1024x768",
+            quality="standard",
+            n=1,
+        )
+        image_url = response.data[0].url
+        return image_url
+    except Exception as e:
+        st.error(f"An error occurred while generating the image: {str(e)}")
+        return None
 
 # Function to generate and display image
 def generate_and_display_image(message):
     image_prompt = message.split("[IMAGE:")[-1].split("]")[0].strip()
     image_url = generate_image(image_prompt)
-    st.session_state.current_image = image_url
+    if image_url:
+        st.session_state.current_image = image_url
 
 # Function to display chat history
 def display_chat_history():
