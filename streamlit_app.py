@@ -88,9 +88,10 @@ def get_ai_response(messages):
 # Function to generate image using DALL-E
 def generate_image(prompt):
     try:
+        full_prompt = f"Create a Fantastic D&D story image in the stylings of artists Virgil Finley, Frank Frazetta, and Ralph Bhakshi: {prompt}"
         response = client.images.generate(
             model="dall-e-3",
-            prompt=prompt,
+            prompt=full_prompt,
             size="1024x768",
             quality="standard",
             n=1,
