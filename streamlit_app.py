@@ -3,7 +3,7 @@ import openai
 import llama_index
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
 from llama_index.embeddings.openai import OpenAIEmbedding
-from llama_index.node_parser import SentenceSplitter
+from llama_index.cord.node_parser import SentenceSplitter
 from llama_index.llms import OpenAI as LlamaOpenAI
 
 from toolhouse import Toolhouse
