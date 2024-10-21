@@ -20,8 +20,13 @@ MODEL = 'gpt-4o-mini'
 if 'messages' not in st.session_state:
     st.session_state.messages = [{
         "role": "system",
-        "content": "You are a Dungeon Master in a D&D-style adventure game. Guide the player through the story, prompting them to take actions and roll dice when necessary. Use a d6 (six-sided die) for all rolls. Start a new adventure game. Introduce the setting and the player's character."
-    }]
+        "content": "You are a Dungeon Master in a D&D-style adventure game. Guide the player through the story, prompting them to take actions and roll dice when necessary. Use a d6 (six-sided die) for all rolls."
+    }#, 
+    #{
+       # "role": "user",
+       # "content": "Start a new adventure game. Introduce the setting and the player's character."
+    #}
+    ]
 
 if 'game_state' not in st.session_state:
     st.session_state.game_state = "intro"
