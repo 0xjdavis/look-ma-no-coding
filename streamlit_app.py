@@ -1,6 +1,7 @@
 import streamlit as st
 import random
 from openai import OpenAI
+import time 
 
 # Set API Keys (using st.secrets for Streamlit)
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
@@ -84,8 +85,9 @@ def generate_image(prompt):
         return response.data[0].url
     except Exception as e:
         st.error(f"An error occurred while generating the image: {str(e)}")
+        time.sleep(5) 
         return None
-
+        
 # Function to extract and display image
 def generate_and_display_image(message):
     if "[IMAGE:" in message:
