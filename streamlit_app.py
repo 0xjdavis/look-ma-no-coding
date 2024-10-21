@@ -20,7 +20,7 @@ Player action:
 2. [Second action option]
 3. [Third action option]
 
-Provide 2-4 options for each action prompt. The player will respond with the number of their chosen action.
+Provide 2-4 options for each action prompt. The player will respond with their chosen action.
 
 When a situation requires a skill check or an action with uncertain outcome, explicitly ask the player to roll a d6 (six-sided die). Format your request for a dice roll as follows: '[ROLL THE DICE: reason for rolling]' For example: '[ROLL THE DICE: to see if you successfully track the creature]'
 
@@ -36,7 +36,6 @@ if 'game_state' not in st.session_state:
     st.session_state.game_state = "not_started"
     st.session_state.messages = []
     st.session_state.roll_result = None
-    st.session_state.action_options = []
 
 # Initialize form values in session state
 if 'Name' not in st.session_state:
@@ -56,7 +55,6 @@ def update_game():
         })
         ai_message = get_ai_response(st.session_state.messages)
         st.session_state.messages.append({"role": "assistant", "content": ai_message})
-        parse_action_options(ai_message)
 
 # Sidebar form
 st.sidebar.title("Create your character")
@@ -88,14 +86,6 @@ def display_chat_history():
 def is_roll_request(message):
     return '[ROLL THE DICE:' in message
 
-# Function to parse action options from AI message
-def parse_action_options(message):
-    if "Player action:" in message:
-        options = message.split("Player action:")[1].strip().split("\n")
-        st.session_state.action_options = [opt.split(". ", 1)[1] for opt in options if opt.strip()]
-    else:
-        st.session_state.action_options = []
-
 # Streamlit UI
 st.title("D&D Adventure Game")
 
@@ -107,11 +97,10 @@ if st.session_state.game_state == "not_started":
         st.session_state.messages = [{"role": "system", "content": initial_prompt}]
         st.session_state.messages.append({
             "role": "user",
-            "content": "Start a new adventure game. Introduce the setting and provide the first set of action options."
+            "content": "Start a new adventure game. Introduce the setting."
         })
         ai_message = get_ai_response(st.session_state.messages)
         st.session_state.messages.append({"role": "assistant", "content": ai_message})
-        parse_action_options(ai_message)
         st.rerun()
 
 # Main game loop
@@ -126,26 +115,15 @@ if st.session_state.game_state == "playing":
             st.session_state.messages.append({"role": "user", "content": roll_message})
             ai_message = get_ai_response(st.session_state.messages)
             st.session_state.messages.append({"role": "assistant", "content": ai_message})
-            parse_action_options(ai_message)
-            st.rerun()
-    elif st.session_state.action_options:
-        # Display action options
-        st.write("Choose your action:")
-        for i, option in enumerate(st.session_state.action_options, 1):
-            st.write(f"{i}. {option}")
-        
-        # User input for action choice
-        action_choice = st.number_input("Enter the number of your chosen action:", min_value=1, max_value=len(st.session_state.action_options), step=1)
-        if st.button("Confirm Action"):
-            chosen_action = st.session_state.action_options[action_choice - 1]
-            user_message = f"I choose to: {chosen_action}"
-            st.session_state.messages.append({"role": "user", "content": user_message})
-            ai_message = get_ai_response(st.session_state.messages)
-            st.session_state.messages.append({"role": "assistant", "content": ai_message})
-            parse_action_options(ai_message)
             st.rerun()
     else:
-        st.write("Waiting for the Dungeon Master...")
+        # User input
+        user_input = st.chat_input("What would you like to do?")
+        if user_input:
+            st.session_state.messages.append({"role": "user", "content": user_input})
+            ai_message = get_ai_response(st.session_state.messages)
+            st.session_state.messages.append({"role": "assistant", "content": ai_message})
+            st.rerun()
 
 # Run the Streamlit app
 if __name__ == "__main__":
