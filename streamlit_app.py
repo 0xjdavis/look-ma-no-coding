@@ -111,10 +111,13 @@ def generate_and_display_image(message):
                     st.write(f"Generated Image URL: {image_url}")
                 else:
                     st.error("Failed to generate an image. Please try again.")
+                    time.sleep(5)
             else:
                 st.error("No valid image prompt found.")
+                time.sleep(5)
         except Exception as e:
             st.error(f"Error generating image: {str(e)}")
+            time.sleep(5)
             st.write(f"Details: {str(e)}")
 
 # Function to read the story out loud using gTTS
