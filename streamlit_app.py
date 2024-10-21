@@ -1,6 +1,7 @@
 import streamlit as st
 import random
 from openai import OpenAI
+from openai.types.error import APIConnectionError
 import io
 import requests
 
@@ -59,8 +60,9 @@ def update_game():
             "content": "The player has updated their character. Please acknowledge the changes and continue the story."
         })
         ai_message = get_ai_response(st.session_state.messages)
-        st.session_state.messages.append({"role": "assistant", "content": ai_message})
-        generate_and_display_image(ai_message)
+        if ai_message:
+            st.session_state.messages.append({"role": "assistant", "content": ai_message})
+            generate_and_display_image(ai_message)
 
 # Sidebar form
 st.sidebar.title("Create your character")
@@ -73,31 +75,49 @@ st.session_state.Inventory = st.sidebar.text_input("Inventory", st.session_state
 def roll_d6():
     return random.randint(1, 6)
 
+# Function to display error messages
+def display_error(message):
+    st.error(message)
+
 # Function to get AI response
 def get_ai_response(messages):
-    response = client.chat.completions.create(
-        model=MODEL,
-        messages=messages
-    )
-    return response.choices[0].message.content
+    try:
+        response = client.chat.completions.create(
+            model=MODEL,
+            messages=messages
+        )
+        return response.choices[0].message.content
+    except APIConnectionError as e:
+        display_error("Unable to connect to the AI service. Please try again later.")
+        return None
+    except Exception as e:
+        display_error(f"An error occurred: {str(e)}")
+        return None
 
 # Function to generate image using DALL-E
 def generate_image(prompt):
-    response = client.images.generate(
-        model="dall-e-3",
-        prompt=prompt,
-        size="1024x768",
-        quality="standard",
-        n=1,
-    )
-    image_url = response.data[0].url
-    return image_url
+    try:
+        response = client.images.generate(
+            model="dall-e-3",
+            prompt=prompt,
+            size="1024x768",
+            quality="standard",
+            n=1,
+        )
+        return response.data[0].url
+    except APIConnectionError as e:
+        display_error("Unable to generate image. Please try again later.")
+        return None
+    except Exception as e:
+        display_error(f"An error occurred while generating the image: {str(e)}")
+        return None
 
 # Function to generate and display image
 def generate_and_display_image(message):
     image_prompt = message.split("[IMAGE:")[-1].split("]")[0].strip()
     image_url = generate_image(image_prompt)
-    st.session_state.current_image = image_url
+    if image_url:
+        st.session_state.current_image = image_url
 
 # Function to display chat history
 def display_chat_history():
@@ -128,8 +148,9 @@ if st.session_state.game_state == "not_started":
             "content": "Start a new adventure game. Introduce the setting."
         })
         ai_message = get_ai_response(st.session_state.messages)
-        st.session_state.messages.append({"role": "assistant", "content": ai_message})
-        generate_and_display_image(ai_message)
+        if ai_message:
+            st.session_state.messages.append({"role": "assistant", "content": ai_message})
+            generate_and_display_image(ai_message)
         st.rerun()
 
 # Main game loop
@@ -143,8 +164,9 @@ if st.session_state.game_state == "playing":
             roll_message = f"You rolled a {roll_result}."
             st.session_state.messages.append({"role": "user", "content": roll_message})
             ai_message = get_ai_response(st.session_state.messages)
-            st.session_state.messages.append({"role": "assistant", "content": ai_message})
-            generate_and_display_image(ai_message)
+            if ai_message:
+                st.session_state.messages.append({"role": "assistant", "content": ai_message})
+                generate_and_display_image(ai_message)
             st.rerun()
     else:
         # User input
@@ -152,8 +174,9 @@ if st.session_state.game_state == "playing":
         if user_input:
             st.session_state.messages.append({"role": "user", "content": user_input})
             ai_message = get_ai_response(st.session_state.messages)
-            st.session_state.messages.append({"role": "assistant", "content": ai_message})
-            generate_and_display_image(ai_message)
+            if ai_message:
+                st.session_state.messages.append({"role": "assistant", "content": ai_message})
+                generate_and_display_image(ai_message)
             st.rerun()
 
 # Run the Streamlit app
