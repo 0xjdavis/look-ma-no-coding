@@ -1,6 +1,8 @@
 import streamlit as st
 import random
 from openai import OpenAI
+import io
+import requests
 
 # Set API Keys (using st.secrets for Streamlit)
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
@@ -29,13 +31,16 @@ After the player rolls, interpret the result as follows:
 3-4 = Partial success
 5-6 = Complete success
 
-Wait for the player's roll or action choice before continuing the story."""
+Wait for the player's roll or action choice before continuing the story.
+
+At the end of each response, provide a brief description (1-2 sentences) of the current scene or action for image generation. Format it as: [IMAGE: description for image generation]"""
 
 # Initialize session state
 if 'game_state' not in st.session_state:
     st.session_state.game_state = "not_started"
     st.session_state.messages = []
     st.session_state.roll_result = None
+    st.session_state.current_image = None
 
 # Initialize form values in session state
 if 'Name' not in st.session_state:
@@ -55,6 +60,7 @@ def update_game():
         })
         ai_message = get_ai_response(st.session_state.messages)
         st.session_state.messages.append({"role": "assistant", "content": ai_message})
+        generate_and_display_image(ai_message)
 
 # Sidebar form
 st.sidebar.title("Create your character")
@@ -75,6 +81,24 @@ def get_ai_response(messages):
     )
     return response.choices[0].message.content
 
+# Function to generate image using DALL-E
+def generate_image(prompt):
+    response = client.images.generate(
+        model="dall-e-3",
+        prompt=prompt,
+        size="1024x1024",
+        quality="standard",
+        n=1,
+    )
+    image_url = response.data[0].url
+    return image_url
+
+# Function to generate and display image
+def generate_and_display_image(message):
+    image_prompt = message.split("[IMAGE:")[-1].split("]")[0].strip()
+    image_url = generate_image(image_prompt)
+    st.session_state.current_image = image_url
+
 # Function to display chat history
 def display_chat_history():
     for message in st.session_state.messages:
@@ -89,6 +113,10 @@ def is_roll_request(message):
 # Streamlit UI
 st.title("D&D Adventure Game")
 
+# Display current image
+if st.session_state.current_image:
+    st.image(st.session_state.current_image, use_column_width=True)
+
 # Start game button
 if st.session_state.game_state == "not_started":
     if st.button("Start New Adventure"):
@@ -101,6 +129,7 @@ if st.session_state.game_state == "not_started":
         })
         ai_message = get_ai_response(st.session_state.messages)
         st.session_state.messages.append({"role": "assistant", "content": ai_message})
+        generate_and_display_image(ai_message)
         st.rerun()
 
 # Main game loop
@@ -115,6 +144,7 @@ if st.session_state.game_state == "playing":
             st.session_state.messages.append({"role": "user", "content": roll_message})
             ai_message = get_ai_response(st.session_state.messages)
             st.session_state.messages.append({"role": "assistant", "content": ai_message})
+            generate_and_display_image(ai_message)
             st.rerun()
     else:
         # User input
@@ -123,6 +153,7 @@ if st.session_state.game_state == "playing":
             st.session_state.messages.append({"role": "user", "content": user_input})
             ai_message = get_ai_response(st.session_state.messages)
             st.session_state.messages.append({"role": "assistant", "content": ai_message})
+            generate_and_display_image(ai_message)
             st.rerun()
 
 # Run the Streamlit app
