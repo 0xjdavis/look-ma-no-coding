@@ -15,12 +15,24 @@ th.set_metadata("timezone", -8)
 # Define the OpenAI model
 MODEL = 'gpt-4o-mini'
 
+st.sidebar.title("Create your character")
+st.sidebar.text("What is your character's name?")
+Name = st.sidebar.text_input("Name", "Eldar")
+st.sidebar.text("What is your character's class? E.g., Hunter, Ranger, Druid, etc.")
+Class = st.sidebar.text_input("Class", "Hunter")
+st.sidebar.text("What skills or abilities do you possess? E.g., tracking, survival, animal handling, etc.")
+Skills = st.sidebar.text_input("Skills", "tracking, animal hanldling")
+st.sidebar.text("Do you have any special items or weapons?")
+Inventory = st.sidebar.text_input("Inventory", "1 Bow, Quiver of 40 arrows")
+
+
+
 # Initialize session state
 if 'game_state' not in st.session_state:
     st.session_state.game_state = "not_started"
     st.session_state.messages = [{
         "role": "system",
-        "content": "You are a Dungeon Master in a D&D-style adventure game. Guide the player through the story, prompting them to take actions and roll dice when necessary. Use a d6 (six-sided die) for all rolls."
+        "content": """You are a Dungeon Master in a D&D-style adventure game. The player's character is defined as """ Class """ named """Name""" with """Skills""" skills and """Inventory""". Guide the player through the story, prompting them to take actions and roll dice when necessary. Use a d6 (six-sided die) for all rolls."
     }]
 
 # Function to roll a d6
