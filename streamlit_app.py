@@ -1,90 +1,43 @@
-import streamlit as st
-import openai
-import llama_index
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
-from llama_index.embeddings.openai import OpenAIEmbedding
-from llama_index.core.node_parser import SentenceSplitter
-from llama_index.llms.openai import OpenAI as LlamaOpenAI
-
+import os
+from typing import List
+# 👋 Make sure you've also installed the OpenAI SDK through: pip install openai
+from openai import OpenAI
 from toolhouse import Toolhouse
 
-# Set up API keys
-OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY")
-TOOLHOUSE_API_KEY = st.secrets.get("TOOLHOUSE_API_KEY")
+# Let's set our API Keys.
+OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
+TOOLHOUSE_API_KEY = st.secrets["TOOLHOUSE_API_KEY"]
+# Please remember to use a safer system to store your API KEYS 
+# after finishing the quick start.
+client = OpenAI(api_key=OPENAI_API_KEY)
+th = Toolhouse(access_token=TOOLHOUSE_API_KEY,
+provider="openai")
 
-# Validate API Keys
-if not OPENAI_API_KEY or not TOOLHOUSE_API_KEY:
-    st.error("API keys are missing. Please check your configuration.")
-    st.stop()
+# Define the OpenAI model we want to use
+MODEL = 'gpt-4o-mini'
 
-# Initialize OpenAI client
-openai.api_key = OPENAI_API_KEY
+messages = [{
+    "role": "user",
+    "content":
+        "Generate FizzBuzz code."
+        "Execute it to show me the results up to 10."
+}]
 
-# Initialize LlamaIndex components
-embed_model = OpenAIEmbedding(model="text-embedding-3-small")
-node_parser = SentenceSplitter(chunk_size=512, chunk_overlap=20)
-Settings.llm = OpenAI(model="gpt-3.5-turbo", api_key=OPENAI_API_KEY, temperature=0.1)
+response = client.chat.completions.create(
+  model=MODEL,
+  messages=messages,
+  # Passes Code Execution as a tool
+  tools=th.get_tools()
+)
 
-# Initialize Toolhouse
-th = Toolhouse(access_token=TOOLHOUSE_API_KEY, provider="openai")
+# Runs the Code Execution tool, gets the result, 
+# and appends it to the context
+messages += th.run_tools(response)
 
-# Load documents and create index
-try:
-    documents = SimpleDirectoryReader("./data").load_data()
-    index = VectorStoreIndex.from_documents(documents, service_context=service_context)
-    chat_engine = index.as_chat_engine(chat_mode="context")
-except Exception as e:
-    st.error(f"Error loading documents or creating index: {e}")
-    st.stop()
-
-# Streamlit UI setup
-st.title("AI Dungeon Master")
-se.caption("Make your move...")
-
-# Initialize session state
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-# Display previous messages
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-
-# Input handling
-if prompt := st.chat_input("What do you do?"):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-
-    # Prepare conversation context
-    messages = [
-        {"role": "system", "content": "You are an AI Dungeon Master. Create an engaging and dynamic fantasy adventure based on the player's input. Be creative, descriptive, and adapt the story based on the player's choices. Ensure a balance of narrative, dialogue, and action."}
-    ]
-    messages.extend(st.session_state.messages)
-
-    try:
-        # Get response from LlamaIndex chat engine
-        response = chat_engine.chat(prompt)
-
-        # Get tools from Toolhouse
-        tools = th.get_tools()
-
-        # Run tools, if applicable
-        if tools:
-            toolhouse_response = th.run_tools(response.response)
-            assistant_response = toolhouse_response.choices[0]["message"]["content"]
-        else:
-            assistant_response = response.response
-
-        st.session_state.messages.append({"role": "assistant", "content": assistant_response})
-
-        # Display assistant response
-        with st.chat_message("assistant"):
-            st.markdown(assistant_response)
-
-    except Exception as e:
-        st.error(f"Error with the AI service: {e}")
-
-# Sidebar information
-st.sidebar.title("Game Information")
-st.sidebar.info("This is an AI-powered Dungeon Master. Describe your actions, and the AI will respond with the next part of your adventure. Enjoy your journey!")
+response = client.chat.completions.create(
+  model=MODEL,
+  messages=messages,
+  tools=th.get_tools()
+)
+# Prints the response with the answer
+print(response.choices[0].message.content)
