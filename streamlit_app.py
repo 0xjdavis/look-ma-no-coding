@@ -79,7 +79,7 @@ def generate_image(prompt):
         response = client.images.generate(
             model="dall-e-3",
             prompt=full_prompt,
-            size="1024x768",
+            size="1024x1024",
             n=1
         )
         return response.data[0].url
