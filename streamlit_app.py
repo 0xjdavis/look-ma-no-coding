@@ -19,8 +19,8 @@ MODEL = 'gpt-4o-mini'
 messages = [{
     "role": "user",
     "content":
-        "Generate FizzBuzz code."
-        "Execute it to show me the results up to 10."
+        "Create the outline for a wonderful adventure in the world of imaginary dungeons and dragons world. Act as the Dungeon Master propting the user and other players to role when it is their turn. Outline the rules in terms of the number the player roles and what happens to their character."
+        "Start the game off with communicating to all the players the story and who the players are. Prompt the user to take an action based off of rolling a number between 1 and 6."
 }]
 
 response = client.chat.completions.create(
