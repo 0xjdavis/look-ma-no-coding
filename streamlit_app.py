@@ -1,7 +1,10 @@
 import streamlit as st
 import random
 from openai import OpenAI
-import time 
+import time
+# FOR TEXT TO SPEECH
+from gtts import gTTS
+import os
 
 # Set API Keys (using st.secrets for Streamlit)
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
@@ -114,6 +117,17 @@ def generate_and_display_image(message):
             st.error(f"Error generating image: {str(e)}")
             st.write(f"Details: {str(e)}")
 
+# Function to read the story out loud using gTTS
+def read_story_aloud(text):
+    try:
+        tts = gTTS(text)
+        tts.save("story.mp3")
+        audio_file = open("story.mp3", "rb")
+        audio_bytes = audio_file.read()
+        st.audio(audio_bytes, format='audio/mp3')
+    except Exception as e:
+        st.error(f"An error occurred while generating audio: {str(e)}")
+
 # Display chat history
 def display_chat_history():
     for message in st.session_state.messages:
@@ -145,6 +159,7 @@ if st.session_state.game_state == "not_started":
         ai_message = get_ai_response(st.session_state.messages)
         st.session_state.messages.append({"role": "assistant", "content": ai_message})
         generate_and_display_image(ai_message)
+        read_story_aloud(ai_message)
         st.rerun()
 
 # Main game loop
@@ -160,6 +175,7 @@ if st.session_state.game_state == "playing":
             ai_message = get_ai_response(st.session_state.messages)
             st.session_state.messages.append({"role": "assistant", "content": ai_message})
             generate_and_display_image(ai_message)
+            read_story_aloud(ai_message)
             st.rerun()
     else:
         # User input
@@ -169,4 +185,5 @@ if st.session_state.game_state == "playing":
             ai_message = get_ai_response(st.session_state.messages)
             st.session_state.messages.append({"role": "assistant", "content": ai_message})
             generate_and_display_image(ai_message)
+            read_story_aloud(ai_message)
             st.rerun()
