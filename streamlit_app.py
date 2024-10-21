@@ -65,18 +65,24 @@ if st.session_state.game_state == "not_started":
         st.rerun()
 
 # Main game loop
-if st.session_state.game_state == "playing":
+if st.session_state.game_state in ["playing", "ready_to_roll"]:
     display_chat_history()
 
     # Dice rolling section
     if "roll" in st.session_state.messages[-1]["content"].lower() and "dice" in st.session_state.messages[-1]["content"].lower():
-        if st.button("Roll Dice"):
-            st.session_state.roll_result = roll_d6()
-            roll_message = f"You rolled a {st.session_state.roll_result}."
-            st.session_state.messages.append({"role": "user", "content": roll_message})
-            ai_message = get_ai_response(st.session_state.messages)
-            st.session_state.messages.append({"role": "assistant", "content": ai_message})
-            st.rerun()
+        if st.session_state.game_state == "playing":
+            if st.button("Roll Dice"):
+                st.session_state.game_state = "ready_to_roll"
+                st.rerun()
+        elif st.session_state.game_state == "ready_to_roll":
+            if st.button("Submit Roll"):
+                st.session_state.roll_result = roll_d6()
+                roll_message = f"You rolled a {st.session_state.roll_result}."
+                st.session_state.messages.append({"role": "user", "content": roll_message})
+                ai_message = get_ai_response(st.session_state.messages)
+                st.session_state.messages.append({"role": "assistant", "content": ai_message})
+                st.session_state.game_state = "playing"
+                st.rerun()
 
     # Display roll result
     if st.session_state.roll_result is not None:
@@ -84,12 +90,13 @@ if st.session_state.game_state == "playing":
         st.session_state.roll_result = None
 
     # User input
-    user_input = st.chat_input("What would you like to do?")
-    if user_input:
-        st.session_state.messages.append({"role": "user", "content": user_input})
-        ai_message = get_ai_response(st.session_state.messages)
-        st.session_state.messages.append({"role": "assistant", "content": ai_message})
-        st.rerun()
+    if st.session_state.game_state == "playing":
+        user_input = st.chat_input("What would you like to do?")
+        if user_input:
+            st.session_state.messages.append({"role": "user", "content": user_input})
+            ai_message = get_ai_response(st.session_state.messages)
+            st.session_state.messages.append({"role": "assistant", "content": ai_message})
+            st.rerun()
 
 # Run the Streamlit app
 if __name__ == "__main__":
