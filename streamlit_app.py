@@ -2,17 +2,22 @@ import streamlit as st
 import random
 from openai import OpenAI
 import time
-# FOR TEXT TO SPEECH
-from gtts import gTTS
-import os
+import pyttsx3  # New import for offline TTS
 
 # Set API Keys (using st.secrets for Streamlit)
-OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
+try:
+    OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
+except KeyError:
+    st.error("Missing OpenAI API key in Streamlit secrets.")
+    st.stop()
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Define the OpenAI model
 MODEL = 'gpt-4'
+
+# Initialize the TTS engine for pyttsx3
+engine = pyttsx3.init()
 
 # Function to generate the PROMPT based on current form values
 def generate_prompt():
@@ -71,9 +76,8 @@ def get_ai_response(messages):
         )
         return response.choices[0].message.content
     except Exception as e:
-        st.error(f"An error occurred: {str(e)}")
-        time.sleep(5)
-        return "I apologize, but I'm having trouble connecting to the AI service that makes this fantasy possible. Maybe you should go outside."
+        st.error(f"An error occurred connecting to OpenAI: {str(e)}")
+        return "I apologize, but I'm having trouble connecting to the AI service at the moment. Maybe take a break or check your connection."
 
 # Function to generate image using DALL-E
 def generate_image(prompt):
@@ -91,16 +95,13 @@ def generate_image(prompt):
         st.error(f"An error occurred while generating the image: {str(e)}")
         time.sleep(5) 
         return None
-        
+
 # Function to extract and display image
 def generate_and_display_image(message):
     if "[IMAGE:" in message:
         try:
             # Extract the image prompt from the message
             image_prompt = message.split("[IMAGE:")[-1].split("]")[0].strip()
-            
-            # Log the extracted prompt for debugging
-            st.write(f"Extracted Image Prompt: {image_prompt}")
             
             if image_prompt:
                 image_url = generate_image(image_prompt)
@@ -109,31 +110,20 @@ def generate_and_display_image(message):
                 if image_url:
                     st.session_state.current_image = image_url
                     st.image(image_url, caption=image_url, use_column_width=True)
-                    st.write(f"Generated Image URL: {image_url}")
                 else:
                     st.error("Failed to generate an image. Please try again.")
-                    time.sleep(5)
             else:
                 st.error("No valid image prompt found.")
-                time.sleep(5)
         except Exception as e:
             st.error(f"Error generating image: {str(e)}")
-            time.sleep(5)
-            st.write(f"Details: {str(e)}")
 
-# Function to read the story out loud using gTTS
+# Function to read the story out loud using pyttsx3
 def read_story_aloud(text):
     try:
-        tts = gTTS(text)  # Generate speech from text
-        tts.save("story.mp3")  # Save as an MP3 file
-        
-        # Load and play the audio file
-        with open("story.mp3", "rb") as audio_file:
-            audio_bytes = audio_file.read()
-            st.audio(audio_bytes, format="audio/mp3")
+        engine.say(text)
+        engine.runAndWait()
     except Exception as e:
-        st.error(f"An error occurred while generating or playing audio: {str(e)}")
-        time.sleep(5)
+        st.error(f"An error occurred while generating audio: {str(e)}")
 
 # Display chat history
 def display_chat_history():
