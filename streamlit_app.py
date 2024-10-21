@@ -136,7 +136,6 @@ def read_story_aloud(text):
         tts.write_to_fp(mp3_fp)
         mp3_fp.seek(0)
         st.audio(mp3_fp, format="audio/mp3")
-        st.write(mp3_fp)
     except Exception as e:
         st.error(f"An error occurred while generating audio: {str(e)}")
 
@@ -146,6 +145,7 @@ def display_chat_history():
     for message in st.session_state.messages:
         if message["role"] != "system":
             with st.chat_message(message["role"]):
+                generate_and_display_image(ai_message)
                 st.write(message["content"])
                 # Play the audio after each message by the assistant
                 if message["role"] == "assistant":
@@ -174,8 +174,8 @@ if st.session_state.game_state == "not_started":
         })
         ai_message = get_ai_response(st.session_state.messages)
         st.session_state.messages.append({"role": "assistant", "content": ai_message})
-        generate_and_display_image(ai_message)
-        read_story_aloud(ai_message)
+        #generate_and_display_image(ai_message)
+        #read_story_aloud(ai_message)
         st.rerun()
 
 # Main game loop
@@ -190,8 +190,8 @@ if st.session_state.game_state == "playing":
             st.session_state.messages.append({"role": "user", "content": roll_message})
             ai_message = get_ai_response(st.session_state.messages)
             st.session_state.messages.append({"role": "assistant", "content": ai_message})
-            generate_and_display_image(ai_message)
-            read_story_aloud(ai_message)
+            #generate_and_display_image(ai_message)
+            #read_story_aloud(ai_message)
             st.rerun()
     else:
         # User input
@@ -200,6 +200,6 @@ if st.session_state.game_state == "playing":
             st.session_state.messages.append({"role": "user", "content": user_input})
             ai_message = get_ai_response(st.session_state.messages)
             st.session_state.messages.append({"role": "assistant", "content": ai_message})
-            generate_and_display_image(ai_message)
-            read_story_aloud(ai_message)
+            #generate_and_display_image(ai_message)
+            #read_story_aloud(ai_message)
             st.rerun()
