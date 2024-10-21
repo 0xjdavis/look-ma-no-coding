@@ -16,16 +16,7 @@ Class = st.sidebar.text_input("Class", "Hunter")
 Skills = st.sidebar.text_input("Skills", "tracking, animal handling")
 Inventory = st.sidebar.text_input("Inventory", "1 Bow, Quiver of 40 arrows")
 
-PROMPT = f"""You are a Dungeon Master in a D&D-style adventure game. The player's character is defined as """ + {Class} + """ named """ + {Name} + """ with """ + {Skills} + """ skills and """ + {Inventory} + """. 
-Guide the player through the story, prompting them to take actions. When a situation requires a skill check or an action with uncertain outcome, explicitly ask the player to roll a d6 (six-sided die).
-Format your request for a dice roll as follows: '[ROLL THE DICE: reason for rolling]'
-For example: '[ROLL THE DICE: to see if you successfully track the creature]'
-After the player rolls, interpret the result as follows:
-1-2: Failure
-3-4: Partial success
-5-6: Complete success
-Wait for the player's roll before continuing the story."""
-
+PROMPT = "You are a Dungeon Master in a D&D-style adventure game. The player's character is defined as " + Class + " named " + Name + " with " + Skills + " skills and " + Inventory + ". Guide the player through the story, prompting them to take actions. When a situation requires a skill check or an action with uncertain outcome, explicitly ask the player to roll a d6 (six-sided die). Format your request for a dice roll as follows: '[ROLL THE DICE: reason for rolling]' For example: '[ROLL THE DICE: to see if you successfully track the creature]' After the player rolls, interpret the result as follows: 1-2 = Failure. 3-4 = Partial success. 5-6 = Complete success. Wait for the player's roll before continuing the story."
 # Initialize session state
 if 'game_state' not in st.session_state:
     st.session_state.game_state = "not_started"
