@@ -123,13 +123,17 @@ def read_story_aloud(text):
     except Exception as e:
         st.error(f"An error occurred while generating audio: {str(e)}")
 
+
 # Display chat history
 def display_chat_history():
     for message in st.session_state.messages:
         if message["role"] != "system":
             with st.chat_message(message["role"]):
                 st.write(message["content"])
-
+                # Play the audio after each message by the assistant
+                if message["role"] == "assistant":
+                    read_story_aloud(message["content"])
+                    
 # Function to check if AI is requesting a dice roll
 def is_roll_request(message):
     return '[ROLL THE DICE:' in message
