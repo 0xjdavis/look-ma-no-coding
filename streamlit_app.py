@@ -1,8 +1,10 @@
 import streamlit as st
 import openai
-import llama_index
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
-from llama_index.llms.openai import OpenAI
+from llama_index import VectorStoreIndex, SimpleDirectoryReader
+from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.node_parser import SentenceSplitter
+from llama_index.llms import OpenAI as LlamaOpenAI
+from llama_index import ServiceContext
 from toolhouse import Toolhouse
 
 # Set up API keys
@@ -14,21 +16,30 @@ if not OPENAI_API_KEY or not TOOLHOUSE_API_KEY:
     st.error("API keys are missing. Please check your configuration.")
     st.stop()
 
-# Initialize OpenAI client directly using the OpenAI Python library (1.0.0+ syntax)
+# Initialize OpenAI client
 openai.api_key = OPENAI_API_KEY
 
-# Initialize LlamaIndex OpenAI client for the LLM
-llm_client = OpenAI(api_key=OPENAI_API_KEY, model="gpt-4", temperature=0.7)
+# Initialize LlamaIndex components
+embed_model = OpenAIEmbedding(model="text-embedding-3-small")
+node_parser = SentenceSplitter(chunk_size=512, chunk_overlap=20)
+llm = LlamaOpenAI(model="gpt-3.5-turbo", api_key=OPENAI_API_KEY)
+service_context = ServiceContext.from_defaults(
+    llm=llm,
+    embed_model=embed_model,
+    node_parser=node_parser
+)
 
 # Initialize Toolhouse
 th = Toolhouse(access_token=TOOLHOUSE_API_KEY, provider="openai")
 
 # Load documents and create index
-documents = SimpleDirectoryReader("./data").load_data()
-
-# Create the VectorStoreIndex with the LLM service context
-index = VectorStoreIndex.from_documents(documents, service_context=llm_client)
-chat_engine = index.as_chat_engine(chat_mode="context")
+try:
+    documents = SimpleDirectoryReader("./data").load_data()
+    index = VectorStoreIndex.from_documents(documents, service_context=service_context)
+    chat_engine = index.as_chat_engine(chat_mode="context")
+except Exception as e:
+    st.error(f"Error loading documents or creating index: {e}")
+    st.stop()
 
 # Streamlit UI setup
 st.title("AI Dungeon Master")
@@ -48,28 +59,26 @@ if prompt := st.chat_input("What do you do?"):
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # Prepare conversation context by creating a list of role-message dictionaries
+    # Prepare conversation context
     messages = [
         {"role": "system", "content": "You are an AI Dungeon Master. Create an engaging and dynamic fantasy adventure based on the player's input. Be creative, descriptive, and adapt the story based on the player's choices. Ensure a balance of narrative, dialogue, and action."}
     ]
     messages.extend(st.session_state.messages)
 
     try:
+        # Get response from LlamaIndex chat engine
+        response = chat_engine.chat(prompt)
+
         # Get tools from Toolhouse
         tools = th.get_tools()
 
-        # Make OpenAI chat completion call using the correct endpoint for chat models
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=messages
-        )
-
         # Run tools, if applicable
         if tools:
-            response = th.run_tools(response)
+            toolhouse_response = th.run_tools(response.response)
+            assistant_response = toolhouse_response.choices[0]["message"]["content"]
+        else:
+            assistant_response = response.response
 
-        # Extract assistant response
-        assistant_response = response.choices[0]["message"]["content"]
         st.session_state.messages.append({"role": "assistant", "content": assistant_response})
 
         # Display assistant response
