@@ -74,22 +74,34 @@ def get_ai_response(messages):
         st.error(f"An error occurred: {str(e)}")
         return "I apologize, but I'm having trouble connecting to the AI service at the moment. Please try again later."
 
-# Function to generate image using DALL-E
-def generate_image(prompt):
-    try:
-        full_prompt = f"A high-quality fantasy image: {prompt}"
-        response = client.images.generate(
-            model="dall-e-3",
-            prompt=full_prompt,
-            size="1024x768",
-            n=1,
-        )
-        image_url = response.data[0].url
-        return image_url
-    except Exception as e:
-        st.error(f"An error occurred while generating the image: {str(e)}")
-        return None
-
+# Function to generate and display image
+def generate_and_display_image(message):
+    if "[IMAGE:" in message:
+        try:
+            # Extract the image prompt from the message
+            image_prompt = message.split("[IMAGE:")[-1].split("]")[0].strip()
+            
+            # Log the extracted prompt to debug
+            st.write(f"Extracted Image Prompt: {image_prompt}")
+            
+            # Ensure the prompt is not empty before sending to DALL-E
+            if image_prompt:
+                image_url = generate_image(image_prompt)
+                
+                # Log and display the generated image if available
+                if image_url:
+                    st.session_state.current_image = image_url
+                    st.image(image_url, caption=image_url, use_column_width=True)
+                    st.write(f"Generated Image URL: {image_url}")  # Log the image URL for debugging
+                else:
+                    st.error("Failed to generate an image. Please try again later.")
+            else:
+                st.error("The image prompt is empty. No valid prompt to generate the image.")
+        except Exception as e:
+            st.error(f"Image generation failed: {str(e)}")
+            st.write(f"Error details: {str(e)}")
+    else:
+        st.error("No valid image prompt found.")
 # Function to generate and display image
 def generate_and_display_image(message):
     if "[IMAGE:" in message:
