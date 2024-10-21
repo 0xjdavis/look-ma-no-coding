@@ -88,20 +88,20 @@ while True:
                     "role": "user",
                     "content": "Start a new adventure game. Introduce the setting and the player's character."
                 })
-                st.experimental_rerun()
+                st.rerun()
         
         elif st.session_state.game_state in ["intro", "continue"]:
             display_chat_history()
             user_input = st.chat_input("What would you like to do?")
             if user_input:
                 handle_user_input(user_input)
-                st.experimental_rerun()
+                st.rerun()
         
         elif st.session_state.game_state == "waiting_for_roll":
             display_chat_history()
             if st.button("Roll Dice"):
                 handle_dice_roll()
-                st.experimental_rerun()
+                st.rerun()
     
     # Break the loop to prevent infinite rerunning
     break
