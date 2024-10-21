@@ -2,6 +2,7 @@ import streamlit as st
 import random
 from openai import OpenAI
 import json
+import time
 
 # Set API Keys (using st.secrets for Streamlit)
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
@@ -94,17 +95,23 @@ def generate_and_display_image(message):
     if "[IMAGE:" in message:
         try:
             image_prompt = message.split("[IMAGE:")[-1].split("]")[0].strip()
+            st.write(f"Image prompt: {image_prompt}")  # Log the prompt to debug
             image_url = generate_image(image_prompt)
+            
             if image_url:
                 st.session_state.current_image = image_url
-                # Corrected: Display image with the image_url both for display and as caption
-                st.image(image_url, caption=image_url, use_column_width=True)  # Added use_column_width for better sizing
+                # Display the image and URL as a caption
+                st.image(image_url, caption=image_url, use_column_width=True)
+                st.write(f"Generated Image URL: {image_url}")  # Log the image URL for debugging
             else:
                 st.error("Failed to generate an image. Please try again later.")
         except Exception as e:
-            st.error(f"Image prompt extraction failed: {str(e)}")
+            st.error(f"Image generation failed: {str(e)}")
+            st.write(f"Error details: {str(e)}")  # Log the detailed error
+            time.sleep(5)  # Pause to allow you to see the error before the next rerun
     else:
         st.error("No valid image prompt found.")
+        time.sleep(3)  # Slow down so you can see the error message
 
 # Function to display chat history
 def display_chat_history():
