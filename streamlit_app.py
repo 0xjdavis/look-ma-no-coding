@@ -40,4 +40,4 @@ response = client.chat.completions.create(
   tools=th.get_tools()
 )
 # Prints the response with the answer
-print(response.choices[0].message.content)
+st.write(response.choices[0].message.content)
