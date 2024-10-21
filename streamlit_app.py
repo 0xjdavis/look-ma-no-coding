@@ -121,7 +121,7 @@ st.title("D&D Adventure Game")
 
 # Display current image
 if st.session_state.current_image:
-    st.image(st.session_state.current_image, use_column_width=True)
+    st.image(st.session_state.current_image, st.session_state.current_image, use_column_width=True)
 
 # Start game button
 if st.session_state.game_state == "not_started":
@@ -134,8 +134,8 @@ if st.session_state.game_state == "not_started":
             "content": "Start a new adventure game. Introduce the setting."
         })
         ai_message = get_ai_response(st.session_state.messages)
-        st.session_state.messages.append({"role": "assistant", "content": ai_message})
         generate_and_display_image(ai_message)
+        st.session_state.messages.append({"role": "assistant", "content": ai_message})
         st.rerun()
 
 # Main game loop
@@ -149,8 +149,8 @@ if st.session_state.game_state == "playing":
             roll_message = f"You rolled a {roll_result}."
             st.session_state.messages.append({"role": "user", "content": roll_message})
             ai_message = get_ai_response(st.session_state.messages)
-            st.session_state.messages.append({"role": "assistant", "content": ai_message})
             generate_and_display_image(ai_message)
+            st.session_state.messages.append({"role": "assistant", "content": ai_message})
             st.rerun()
     else:
         # User input
@@ -158,6 +158,6 @@ if st.session_state.game_state == "playing":
         if user_input:
             st.session_state.messages.append({"role": "user", "content": user_input})
             ai_message = get_ai_response(st.session_state.messages)
-            st.session_state.messages.append({"role": "assistant", "content": ai_message})
             generate_and_display_image(ai_message)
+            st.session_state.messages.append({"role": "assistant", "content": ai_message})
             st.rerun()
