@@ -250,9 +250,9 @@ with st.sidebar:
 
 
 # Character creation form in sidebar
-with st.sidebar.subheader("Create your character"):
+with st.sidebar.subheader("Your character"):
     # Display health bar in sidebar
-    st.sidebar.subheader(f"Health: {st.session_state.health}/10")
+    st.sidebar.write(f"Health: {st.session_state.health}/10")
     st.sidebar.progress(st.session_state.health / 10)
     st.session_state.Name = st.sidebar.text_input("Name", st.session_state.Name)
     st.session_state.Race = st.sidebar.selectbox(
