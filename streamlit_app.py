@@ -182,12 +182,7 @@ def is_roll_request(message):
 
 # Streamlit UI
 st.logo(
-    LOGO_URL_LARGE,
-    link="https://streamlit.io/gallery",
-    icon_image=LOGO_URL_SMALL,
-)
-st.logo(
-    large,
+    "logo",
     link="https://preview.redd.it/d-d-logo-feel-free-to-use-for-whatever-v0-swx169zi1e6c1.jpg",
     icon_image="https://preview.redd.it/d-d-logo-feel-free-to-use-for-whatever-v0-swx169zi1e6c1.jpg",
 )
