@@ -182,9 +182,9 @@ def is_roll_request(message):
 
 # Streamlit UI
 st.logo(
-    image="logo.jpg",
-    link="logo.jpg",
-    icon_image="logo.jpg",
+    image="dandd.webp",
+    link="dandd.webp",
+    icon_image="dandd.webp",
 )
 st.title("D&D Adventure Game")
 
