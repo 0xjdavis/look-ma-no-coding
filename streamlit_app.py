@@ -160,7 +160,7 @@ def display_image_directory(directory="data/images"):
         st.markdown(f'<a href="{relative_image_path}" target="_blank">{image_file}</a>', unsafe_allow_html=True)
         
         # Also display the image directly in Streamlit
-        st.image(image_path, caption=image_file, use_column_width=True)
+        #st.image(image_path, caption=image_file, use_column_width=True)
 
 # Function to read the story out loud using gTTS (Google Text-to-Speech)
 def read_story_aloud(text):
