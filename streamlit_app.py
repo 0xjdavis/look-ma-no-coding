@@ -237,17 +237,17 @@ def is_roll_request(message):
 # Streamlit UI
 st.title("D&D Adventure Game")
 
-# Display health bar in sidebar
-st.sidebar.title("Character Status")
-st.sidebar.progress(st.session_state.health / 10)
-st.sidebar.write(f"Health: {st.session_state.health}/10")
-
 # Character creation form in sidebar
-st.sidebar.title("Create your character")
+st.sidebar.subtitle("Create your character")
 st.session_state.Name = st.sidebar.text_input("Name", st.session_state.Name)
 st.session_state.Class = st.sidebar.text_input("Class", st.session_state.Class)
 st.session_state.Skills = st.sidebar.text_input("Skills", st.session_state.Skills)
 st.session_state.Inventory = st.sidebar.text_input("Inventory", st.session_state.Inventory)
+
+# Display health bar in sidebar
+st.sidebar.subtitle("Character Health")
+st.sidebar.progress(st.session_state.health / 10)
+st.sidebar.write(f"Health: {st.session_state.health}/10")
 
 with st.sidebar:
     display_image_directory()
