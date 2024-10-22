@@ -146,7 +146,6 @@ def display_image_directory(directory="data/images"):
     image_path = st.query_params.get("data/images/")
     if image_path:
         image = Image.open(image_path)
-        st.sidebar.image(image)
     
     # Display each image with a link to open in a new tab
     for image_file in image_files:
@@ -154,6 +153,8 @@ def display_image_directory(directory="data/images"):
         
         # Create a relative URL for the image
         relative_image_path = f"{image_path}"
+        
+        st.sidebar.image(image)
         
 # Function to read the story out loud using gTTS (Google Text-to-Speech)
 def read_story_aloud(text):
@@ -193,7 +194,7 @@ with st.sidebar:
     
 # Display current image
 if st.session_state.current_image:
-    st.image(st.session_state.current_image, use_column_width=True)
+    st.sidebar.image(st.session_state.current_image, use_column_width=True)
 
 # Start game button
 if st.session_state.game_state == "not_started":
@@ -203,7 +204,7 @@ if st.session_state.game_state == "not_started":
         st.session_state.messages = [{"role": "system", "content": initial_prompt}]
         st.session_state.messages.append({
             "role": "user",
-            "content": "Start a new adventure game. Introduce the setting."
+            "content": "Start a new adventure Dungeon Master. Introduce the setting."
         })
         ai_message = get_ai_response(st.session_state.messages)
         generate_and_display_image(ai_message)
