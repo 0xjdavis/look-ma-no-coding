@@ -280,14 +280,17 @@ elif st.session_state.game_state == "playing":
         if st.button("Roll Dice"):
             roll_result = roll_d6()
             roll_message = f"You rolled a {roll_result}."
+            
+            # Append the roll message without calling st.rerun
             st.session_state.messages.append({"role": "user", "content": roll_message})
+            
             ai_message = get_ai_response(st.session_state.messages)
             cleaned_message = generate_and_display_image(ai_message)
             
-            # Check for game end conditions
+            # Process game end conditions before updating health
             if check_game_end(cleaned_message):
                 st.session_state.messages.append({"role": "assistant", "content": cleaned_message})
-                st.rerun()
+                # No need to call st.rerun if we process messages in the same render pass
             
             # Update health based on roll result
             if roll_result <= 2:
@@ -295,27 +298,25 @@ elif st.session_state.game_state == "playing":
             elif roll_result <= 4:
                 cleaned_message += f" [DAMAGE:1]"  # Add damage tag for processing
             
+            # Process health and append AI response
             cleaned_message = process_health_changes(cleaned_message)
+            st.session_state.messages.append({"role": "assistant", "content": cleaned_message})
             
-            # Check if health reached 0
+            # Check if health reached 0 and end the game
             if st.session_state.health <= 0:
                 cleaned_message += "\n[DEFEAT: Your health has reached 0. Game Over.]"
                 check_game_end(cleaned_message)
-            
-            st.session_state.messages.append({"role": "assistant", "content": cleaned_message})
-            st.rerun()
+                st.session_state.messages.append({"role": "assistant", "content": cleaned_message})
     else:
-        # User input
+        # Allow the user to input and process their message
         user_input = st.chat_input("What would you like to do?")
         if user_input:
             st.session_state.messages.append({"role": "user", "content": user_input})
             ai_message = get_ai_response(st.session_state.messages)
             cleaned_message = generate_and_display_image(ai_message)
             
-            # Check for game end conditions
+            # Process game end conditions
             if check_game_end(cleaned_message):
                 st.session_state.messages.append({"role": "assistant", "content": cleaned_message})
-                st.rerun()
             
             st.session_state.messages.append({"role": "assistant", "content": cleaned_message})
-            st.rerun()
