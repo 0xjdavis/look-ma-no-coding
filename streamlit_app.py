@@ -182,9 +182,9 @@ def is_roll_request(message):
 
 # Streamlit UI
 st.logo(
-    image="https://preview.redd.it/d-d-logo-feel-free-to-use-for-whatever-v0-swx169zi1e6c1.jpg",
-    link="https://preview.redd.it/d-d-logo-feel-free-to-use-for-whatever-v0-swx169zi1e6c1.jpg",
-    icon_image="https://preview.redd.it/d-d-logo-feel-free-to-use-for-whatever-v0-swx169zi1e6c1.jpg",
+    image="logo.jpg",
+    link="logo.jpg",
+    icon_image="logo.jpg",
 )
 st.title("D&D Adventure Game")
 
