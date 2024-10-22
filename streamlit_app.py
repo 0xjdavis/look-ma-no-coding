@@ -60,7 +60,7 @@ st.session_state.Skills = st.sidebar.text_input("Skills", st.session_state.Skill
 st.session_state.Inventory = st.sidebar.text_input("Inventory", st.session_state.Inventory)
 
 with st.sidebar:
-    display_image_directory())
+    display_image_directory()
 
 # Function to roll a d6
 def roll_d6():
