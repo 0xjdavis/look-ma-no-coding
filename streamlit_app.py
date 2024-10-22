@@ -16,9 +16,11 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 # Define the OpenAI model
 MODEL = 'gpt-4'
 
-# Function to generate the PROMPT based on current form values
 def generate_prompt():
     return f"""You are a Dungeon Master in a D&D-style adventure game. The player's character is defined as {st.session_state.Class} named {st.session_state.Name} with {st.session_state.Skills} skills and {st.session_state.Inventory}. The player has {st.session_state.health}/10 health remaining. Guide the player through the story, prompting them to take actions.
+
+When the player gains health (through potions, healing, rest, etc.), format it as: [HEAL:amount] where 'amount' is the number of health points gained.
+For example: "You drink the healing potion and feel its magic course through you. [HEAL:3]"
 
 Your goal is to guide the player towards finding a magical artifact called the Crystal of Power. Finding this artifact is the win condition for the game.
 
@@ -61,6 +63,31 @@ if 'Name' not in st.session_state:
     st.session_state.Class = "Hunter"
     st.session_state.Skills = "Archer, Tracking, Animal Handling"
     st.session_state.Inventory = "1 Bow, Quiver of 40 arrows"
+
+
+# Function for monitoring health change
+def process_health_changes(message):
+    # Check for healing
+    if "[HEAL:" in message:
+        try:
+            heal_amount = int(message.split("[HEAL:")[1].split("]")[0])
+            update_health(heal_amount)
+            # Remove the heal tag from the message
+            message = message.replace(f"[HEAL:{heal_amount}]", "")
+        except ValueError:
+            st.error("Invalid healing amount specified")
+    
+    # Check for damage (if you have specific damage tags)
+    if "[DAMAGE:" in message:
+        try:
+            damage_amount = int(message.split("[DAMAGE:")[1].split("]")[0])
+            update_health(-damage_amount)
+            # Remove the damage tag from the message
+            message = message.replace(f"[DAMAGE:{damage_amount}]", "")
+        except ValueError:
+            st.error("Invalid damage amount specified")
+    
+    return message
 
 # Function to update health
 def update_health(change):
@@ -141,15 +168,17 @@ def generate_image(prompt):
 
 # Function to extract image prompt and generate image
 def generate_and_display_image(message):
+    # Process health changes first
+    message = process_health_changes(message)
+    
+    # Then handle image generation as before
     if "[IMAGE_PROMPT:" in message:
         try:
-            # Extract the image prompt from the message
             image_prompt = message.split("[IMAGE_PROMPT:")[-1].split("]")[0].strip()
             
             if image_prompt:
                 image_url = generate_image(image_prompt)
                 
-                # Check if the image was successfully generated
                 if image_url:
                     st.session_state.current_image = image_url
                     st.sidebar.image(image_url, caption="Current Scene", use_column_width=True)
@@ -262,9 +291,11 @@ elif st.session_state.game_state == "playing":
             
             # Update health based on roll result
             if roll_result <= 2:
-                update_health(-2)  # Failed roll causes 2 damage
+                cleaned_message += f" [DAMAGE:2]"  # Add damage tag for processing
             elif roll_result <= 4:
-                update_health(-1)  # Partial success causes 1 damage
+                cleaned_message += f" [DAMAGE:1]"  # Add damage tag for processing
+            
+            cleaned_message = process_health_changes(cleaned_message)
             
             # Check if health reached 0
             if st.session_state.health <= 0:
@@ -285,6 +316,6 @@ elif st.session_state.game_state == "playing":
             if check_game_end(cleaned_message):
                 st.session_state.messages.append({"role": "assistant", "content": cleaned_message})
                 st.rerun()
-                
+            
             st.session_state.messages.append({"role": "assistant", "content": cleaned_message})
             st.rerun()
