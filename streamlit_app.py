@@ -147,13 +147,6 @@ def display_image_directory(directory="data/images"):
     if image_path:
         image = Image.open(image_path)
         st.sidebar.image(image)
-    # Display each image with a link to open in a new tab
-    for image_file in image_files:
-        image_path = os.path.join(directory, image_file)
-        
-        # Create a relative URL for the image
-        relative_image_path = f"{image_path}"
-        st.sidebar.image(relative_image_path)
         
         
 # Function to read the story out loud using gTTS (Google Text-to-Speech)
@@ -182,11 +175,11 @@ def is_roll_request(message):
     return '[ROLL THE DICE:' in message
 
 # Streamlit UI
-st.logo(
-    image="dandd.webp",
+#st.logo(
+    #image="dandd.webp",
     #link="dandd.webp",
     #icon_image="dandd.webp",
-)
+#)
 st.title("D&D Adventure Game")
 
 with st.sidebar:
