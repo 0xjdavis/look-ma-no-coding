@@ -165,7 +165,7 @@ def display_image_directory(directory="data/images"):
 # Function to read the story out loud using gTTS (Google Text-to-Speech)
 def read_story_aloud(text):
     try:
-        tts = gTTS(text, lang='en', tld='com.ng')
+        tts = gTTS(text, lang='en', tld='us')
         mp3_fp = BytesIO()
         tts.write_to_fp(mp3_fp)
         mp3_fp.seek(0)
