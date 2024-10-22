@@ -83,7 +83,7 @@ if not os.path.exists('data/images'):
 # Function to generate and save the image locally
 def generate_image(prompt):
     try:
-        full_prompt = f"Create a highly detailed fantasy scene: {prompt}. Include rich, vivid colors, magical elements, and a sense of adventure. Use the artwork stylings of artists Virgil Finley, Frank Frazetta, and Ralph Bakshi as an influence of the images. Create consistant imagery for the entire game. Don't change styles."
+        full_prompt = f"Create a highly detailed fantasy scene: {prompt}. Include rich, vivid colors, magical elements, and a sense of adventure. Use the fantasy artwork stylings of artist Frank Frazetta as an influence of the images. Create consistant imagery for the entire game. Don't change styles."
         
         response = client.images.generate(
             model="dall-e-3",
@@ -173,7 +173,6 @@ def read_story_aloud(text):
     except Exception as e:
         st.error(f"An error occurred while generating audio: {str(e)}")
 
-
 # Display chat history
 def display_chat_history():
     for message in st.session_state.messages:
@@ -211,8 +210,6 @@ if st.session_state.game_state == "not_started":
         ai_message = get_ai_response(st.session_state.messages)
         generate_and_display_image(ai_message)
         st.session_state.messages.append({"role": "assistant", "content": ai_message})
-        #generate_and_display_image(ai_message)
-        #read_story_aloud(ai_message)
         st.rerun()
 
 # Main game loop
@@ -226,9 +223,8 @@ if st.session_state.game_state == "playing":
             roll_message = f"You rolled a {roll_result}."
             st.session_state.messages.append({"role": "user", "content": roll_message})
             ai_message = get_ai_response(st.session_state.messages)
+            generate_and_display_image(ai_message)
             st.session_state.messages.append({"role": "assistant", "content": ai_message})
-            #generate_and_display_image(ai_message)
-            #read_story_aloud(ai_message)
             st.rerun()
     else:
         # User input
@@ -236,8 +232,7 @@ if st.session_state.game_state == "playing":
         if user_input:
             st.session_state.messages.append({"role": "user", "content": user_input})
             ai_message = get_ai_response(st.session_state.messages)
+            generate_and_display_image(ai_message)
             st.session_state.messages.append({"role": "assistant", "content": ai_message})
-            #generate_and_display_image(ai_message)
-            #read_story_aloud(ai_message)
             st.rerun()
             
