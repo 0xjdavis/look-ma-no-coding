@@ -62,9 +62,9 @@ if 'game_state' not in st.session_state:
 # Initialize form values in session state
 if 'Name' not in st.session_state:
     st.session_state.Name = "Ildar"    
-    st.session_state.Race = "Elf"
-    st.session_state.Class = "Ranger"
-    st.session_state.Background = "Soldier"
+    st.session_state.Race = "Dwarf"
+    st.session_state.Class = "Barbarian"
+    st.session_state.Background = "Acolyte"
     st.session_state.Skills = "Archer, Tracking, Animal Handling"
     st.session_state.Inventory = "1 Bow, Quiver of arrows"
 
