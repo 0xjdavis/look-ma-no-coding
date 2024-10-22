@@ -49,7 +49,7 @@ if 'game_state' not in st.session_state:
 if 'Name' not in st.session_state:
     st.session_state.Name = "Eldar"
     st.session_state.Class = "Hunter"
-    st.session_state.Skills = "tracking, animal handling"
+    st.session_state.Skills = "Archer, Tracking, Animal Handling"
     st.session_state.Inventory = "1 Bow, Quiver of 40 arrows"
 
 # Sidebar form
@@ -73,7 +73,7 @@ def get_ai_response(messages):
         return response.choices[0].message.content
     except Exception as e:
         st.error(f"An error occurred connecting to OpenAI: {str(e)}")
-        return "I apologize, but I'm having trouble connecting to the AI service at the moment. Maybe take a break or check your connection."
+        return "I apologize, but I'm having trouble connecting to the AI service at the moment. Maybe go outside."
 
 # Ensure the directory exists
 if not os.path.exists('data/images'):
