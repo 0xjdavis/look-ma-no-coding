@@ -248,12 +248,12 @@ if st.session_state.current_image:
 with st.sidebar:
     display_image_directory()
 
-# Display health bar in sidebar
-st.sidebar.subheader(f"Health: {st.session_state.health}/10")
-st.sidebar.progress(st.session_state.health / 10)
 
 # Character creation form in sidebar
 with st.sidebar.subheader("Create your character"):
+    # Display health bar in sidebar
+    st.sidebar.subheader(f"Health: {st.session_state.health}/10")
+    st.sidebar.progress(st.session_state.health / 10)
     st.session_state.Name = st.sidebar.text_input("Name", st.session_state.Name)
     st.session_state.Race = st.sidebar.selectbox(
         "Race",
