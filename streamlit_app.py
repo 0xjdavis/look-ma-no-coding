@@ -17,7 +17,7 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 MODEL = 'gpt-4'
 
 def generate_prompt():
-    return f"""You are a Dungeon Master in a D&D-style adventure game. The player's character is defined as a {st.session_state.Race} named {st.session_state.Name} who is a {st.session_state.Class} with a {st.session_state.Class} banckground and {st.session_state.Skills} skills with {st.session_state.Inventory} as inventory. The player has {st.session_state.health}/10 health remaining. Guide the player through the story, prompting them to take actions.
+    return f"""You are a Dungeon Master in a D&D-style adventure game. The player's character is defined as a {st.session_state.Race} named {st.session_state.Name} who is a {st.session_state.Class} with a {st.session_state.Background} banckground and {st.session_state.Skills} skills with {st.session_state.Inventory} as inventory. The player has {st.session_state.health}/10 health remaining. Guide the player through the story, prompting them to take actions.
 
 When the player gains health (through potions, healing, rest, etc.), format it as: [HEAL:amount] where 'amount' is the number of health points gained.
 For example: "You drink the healing potion and feel its magic course through you. [HEAL:3]"
