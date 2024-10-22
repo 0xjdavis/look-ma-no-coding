@@ -248,25 +248,25 @@ if st.session_state.current_image:
 with st.sidebar:
     display_image_directory()
 
-    st.sidebar.subheader("Your Character"
-    # Display health bar in sidebar
-    st.sidebar.write(f"Health: {st.session_state.health}/10")
-    st.sidebar.progress(st.session_state.health / 10)
-    st.session_state.Name = st.sidebar.text_input("Name", st.session_state.Name)
-    st.session_state.Race = st.sidebar.selectbox(
-        "Race",
-        ("Dwarf", "Elf", "Halfling", "Human", "Dragonborn", "Gnome", "Half-Elf", "Half-Orc", "Tiefling"),
-    )
-    st.session_state.Class = st.sidebar.selectbox(
-        "Class",
-        ("Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"),
-    )
-    st.session_state.Background = st.sidebar.selectbox(
-        "Background",
-        ("Acolyte", "Charlatan", "Criminal", "Entertainer", "Folk Hero", "Guild Artisan", "Hermit", "Noble", "Outlander", "Sage", "Sailor", "Soldier", "Urchin"),
-    )
-    st.session_state.Skills = st.sidebar.text_input("Skills", st.session_state.Skills)
-    st.session_state.Inventory = st.sidebar.text_input("Inventory", st.session_state.Inventory)
+st.sidebar.subheader("Your Character"
+# Display health bar in sidebar
+st.sidebar.write(f"Health: {st.session_state.health}/10")
+st.sidebar.progress(st.session_state.health / 10)
+st.session_state.Name = st.sidebar.text_input("Name", st.session_state.Name)
+st.session_state.Race = st.sidebar.selectbox(
+    "Race",
+    ("Dwarf", "Elf", "Halfling", "Human", "Dragonborn", "Gnome", "Half-Elf", "Half-Orc", "Tiefling"),
+)
+st.session_state.Class = st.sidebar.selectbox(
+    "Class",
+    ("Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"),
+)
+st.session_state.Background = st.sidebar.selectbox(
+    "Background",
+    ("Acolyte", "Charlatan", "Criminal", "Entertainer", "Folk Hero", "Guild Artisan", "Hermit", "Noble", "Outlander", "Sage", "Sailor", "Soldier", "Urchin"),
+)
+st.session_state.Skills = st.sidebar.text_input("Skills", st.session_state.Skills)
+st.session_state.Inventory = st.sidebar.text_input("Inventory", st.session_state.Inventory)
     
 
 # Handle game states
