@@ -17,7 +17,7 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 MODEL = 'gpt-4'
 
 def generate_prompt():
-    return f"""You are a Dungeon Master in a D&D-style adventure game. The player's character is defined as {st.session_state.Class} named {st.session_state.Name} with {st.session_state.Skills} skills and {st.session_state.Inventory}. The player has {st.session_state.health}/10 health remaining. Guide the player through the story, prompting them to take actions.
+    return f"""You are a Dungeon Master in a D&D-style adventure game. The player's character is defined as a {st.session_state.Race} named {st.session_state.Name} who is a {st.session_state.Class} with a {st.session_state.Class} banckground and {st.session_state.Skills} skills with {st.session_state.Inventory} as inventory. The player has {st.session_state.health}/10 health remaining. Guide the player through the story, prompting them to take actions.
 
 When the player gains health (through potions, healing, rest, etc.), format it as: [HEAL:amount] where 'amount' is the number of health points gained.
 For example: "You drink the healing potion and feel its magic course through you. [HEAL:3]"
@@ -57,12 +57,27 @@ if 'game_state' not in st.session_state:
     st.session_state.image_prompt = None
     st.session_state.health = 10  # Initialize health at 10
 
+
+# CHARACTER
 # Initialize form values in session state
 if 'Name' not in st.session_state:
     st.session_state.Name = "Ildar"
-    st.session_state.Class = "Hunter"
+    st.session_state.Race = st.selectbox(
+        "Race",
+        ("Dwarf", "Elf", "Halfling", "Human", "Dragonborn", "Gnome", "Half-Elf", "Half-Orc", "Tiefling"),
+    )
+    
+    st.session_state.Class = st.selectbox(
+        "Class",
+        ("Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"),
+    )
+    
+    st.session_state.Background = st.selectbox(
+        "Background",
+        ("Acolyte", "Charlatan", "Criminal", "Entertainer", "Folk Hero", "Guild Artisan", "Hermit", "Noble", "Outlander", "Sage", "Sailor", "Soldier", "Urchin"),
+    )
     st.session_state.Skills = "Archer, Tracking, Animal Handling"
-    st.session_state.Inventory = "1 Bow, Quiver of 40 arrows"
+    st.session_state.Inventory = "1 Bow, Quiver of arrows"
 
 
 # Function for monitoring health change
@@ -132,7 +147,7 @@ def get_ai_response(messages):
         return response.choices[0].message.content
     except Exception as e:
         st.error(f"An error occurred connecting to OpenAI: {str(e)}")
-        return "I apologize, but I'm having trouble connecting to the AI service at the moment. Maybe go outside."
+        return "I apologize, but I'm having trouble connecting to the AI service in the real world. Maybe go outside and get some fresh air."
 
 # Ensure the directory exists
 if not os.path.exists('data/images'):
@@ -240,7 +255,9 @@ st.title("D&D Adventure Game")
 # Character creation form in sidebar
 st.sidebar.subheader("Create your character")
 st.session_state.Name = st.sidebar.text_input("Name", st.session_state.Name)
+st.session_state.Race = st.sidebar.text_input("Race", st.session_state.Race)
 st.session_state.Class = st.sidebar.text_input("Class", st.session_state.Class)
+st.session_state.Background = st.sidebar.text_input("Background", st.session_state.Background)
 st.session_state.Skills = st.sidebar.text_input("Skills", st.session_state.Skills)
 st.session_state.Inventory = st.sidebar.text_input("Inventory", st.session_state.Inventory)
 
@@ -266,7 +283,7 @@ elif st.session_state.game_state == "not_started":
         st.session_state.messages = [{"role": "system", "content": initial_prompt}]
         st.session_state.messages.append({
             "role": "user",
-            "content": "Start a new adventure Dungeon Master. Introduce the characters and setting."
+            "content": "Start a new adventure Dungeon Master. Describe the setting."
         })
         ai_message = get_ai_response(st.session_state.messages)
         cleaned_message = generate_and_display_image(ai_message)
