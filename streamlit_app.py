@@ -241,35 +241,37 @@ def is_roll_request(message):
 # Streamlit UI
 st.title("D&D Adventure Game")
 
-# Character creation form in sidebar
-st.sidebar.subheader("Create your character")
-st.session_state.Name = st.sidebar.text_input("Name", st.session_state.Name)
-st.session_state.Race = st.sidebar.selectbox(
-    "Race",
-    ("Dwarf", "Elf", "Halfling", "Human", "Dragonborn", "Gnome", "Half-Elf", "Half-Orc", "Tiefling"),
-)
-st.session_state.Class = st.sidebar.selectbox(
-    "Class",
-    ("Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"),
-)
-st.session_state.Background = st.sidebar.selectbox(
-    "Background",
-    ("Acolyte", "Charlatan", "Criminal", "Entertainer", "Folk Hero", "Guild Artisan", "Hermit", "Noble", "Outlander", "Sage", "Sailor", "Soldier", "Urchin"),
-)
-st.session_state.Skills = st.sidebar.text_input("Skills", st.session_state.Skills)
-st.session_state.Inventory = st.sidebar.text_input("Inventory", st.session_state.Inventory)
+
+# Display current image
+if st.session_state.current_image:
+    st.sidebar.image(st.session_state.current_image, use_column_width=True)
+
+with st.sidebar:
+    display_image_directory()
 
 # Display health bar in sidebar
 st.sidebar.subheader("Character Health")
 st.sidebar.progress(st.session_state.health / 10)
 st.sidebar.write(f"Health: {st.session_state.health}/10")
 
-with st.sidebar:
-    display_image_directory()
-
-# Display current image
-if st.session_state.current_image:
-    st.sidebar.image(st.session_state.current_image, use_column_width=True)
+# Character creation form in sidebar
+with st.expander("Create your character"):
+    st.session_state.Name = st.sidebar.text_input("Name", st.session_state.Name)
+    st.session_state.Race = st.sidebar.selectbox(
+        "Race",
+        ("Dwarf", "Elf", "Halfling", "Human", "Dragonborn", "Gnome", "Half-Elf", "Half-Orc", "Tiefling"),
+    )
+    st.session_state.Class = st.sidebar.selectbox(
+        "Class",
+        ("Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"),
+    )
+    st.session_state.Background = st.sidebar.selectbox(
+        "Background",
+        ("Acolyte", "Charlatan", "Criminal", "Entertainer", "Folk Hero", "Guild Artisan", "Hermit", "Noble", "Outlander", "Sage", "Sailor", "Soldier", "Urchin"),
+    )
+    st.session_state.Skills = st.sidebar.text_input("Skills", st.session_state.Skills)
+    st.session_state.Inventory = st.sidebar.text_input("Inventory", st.session_state.Inventory)
+    
 
 # Handle game states
 if st.session_state.game_state in ["won", "lost"]:
