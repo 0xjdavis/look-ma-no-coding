@@ -6,6 +6,7 @@ from openai import OpenAI
 import time
 from gtts import gTTS  # Google Text-to-Speech
 from io import BytesIO
+from PIL import Image
 
 # Set API Keys (using st.secrets for Streamlit)
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
@@ -141,13 +142,19 @@ def display_image_directory(directory="data/images"):
         return
 
     st.write(f"### Images in `{directory}`:")
+
+    image_path = st.query_params.get("data/images/")
+    if image_path:
+        image = Image.open(image_path)
+        st.image(image)
+
     
     # Display each image with a link to open in a new tab
     for image_file in image_files:
         image_path = os.path.join(directory, image_file)
         
         # Create a relative URL for the image
-        relative_image_path = f"/{image_path}"
+        relative_image_path = f"../{image_path}"
         
         # Use markdown to create a link that opens the image in a new tab
         st.markdown(f'<a href="{relative_image_path}" target="_blank">{image_file}</a>', unsafe_allow_html=True)
