@@ -131,7 +131,7 @@ def generate_and_display_image(message):
 # Function to read the story out loud using gTTS (Google Text-to-Speech)
 def read_story_aloud(text):
     try:
-        tts = gTTS(text)
+        tts = gTTS(text, lang="en")
         mp3_fp = BytesIO()
         tts.write_to_fp(mp3_fp)
         mp3_fp.seek(0)
