@@ -157,10 +157,6 @@ def display_image_directory(directory="data/images"):
         relative_image_path = f"{image_path}"
         
          
-# Main app
-def main():
-    st.title("Image Directory Viewer")
-
 
 
 # Function to read the story out loud using gTTS (Google Text-to-Speech)
@@ -237,7 +233,4 @@ if st.session_state.game_state == "playing":
             st.session_state.messages.append({"role": "assistant", "content": ai_message})
             st.rerun()
 
-
-if __name__ == "__main__":
-    main()
 
