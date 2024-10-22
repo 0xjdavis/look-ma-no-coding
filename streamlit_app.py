@@ -245,13 +245,11 @@ st.title("D&D Adventure Game")
 if st.session_state.current_image:
     st.sidebar.image(st.session_state.current_image, use_column_width=True)
 
-with st.sidebar:
-    display_image_directory()
-
 st.sidebar.subheader("Your Character")
 # Display health bar in sidebar
 st.sidebar.write(f"Health: {st.session_state.health}/10")
 st.sidebar.progress(st.session_state.health / 10)
+# Character Creation Form
 st.session_state.Name = st.sidebar.text_input("Name", st.session_state.Name)
 st.session_state.Race = st.sidebar.selectbox(
     "Race",
@@ -268,7 +266,10 @@ st.session_state.Background = st.sidebar.selectbox(
 st.session_state.Skills = st.sidebar.text_input("Skills", st.session_state.Skills)
 st.session_state.Inventory = st.sidebar.text_input("Inventory", st.session_state.Inventory)
     
-
+# Directory Download
+with st.sidebar:
+    display_image_directory()
+    
 # Handle game states
 if st.session_state.game_state in ["won", "lost"]:
     display_game_over()
