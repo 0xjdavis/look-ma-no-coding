@@ -61,21 +61,10 @@ if 'game_state' not in st.session_state:
 # CHARACTER
 # Initialize form values in session state
 if 'Name' not in st.session_state:
-    st.session_state.Name = "Ildar"
-    st.session_state.Race = st.selectbox(
-        "Race",
-        ("Dwarf", "Elf", "Halfling", "Human", "Dragonborn", "Gnome", "Half-Elf", "Half-Orc", "Tiefling"),
-    )
-    
-    st.session_state.Class = st.selectbox(
-        "Class",
-        ("Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"),
-    )
-    
-    st.session_state.Background = st.selectbox(
-        "Background",
-        ("Acolyte", "Charlatan", "Criminal", "Entertainer", "Folk Hero", "Guild Artisan", "Hermit", "Noble", "Outlander", "Sage", "Sailor", "Soldier", "Urchin"),
-    )
+    st.session_state.Name = "Ildar"    
+    st.session_state.Race = "Elf"
+    st.session_state.Class = "Ranger"
+    st.session_state.Background = "Soldier"
     st.session_state.Skills = "Archer, Tracking, Animal Handling"
     st.session_state.Inventory = "1 Bow, Quiver of arrows"
 
@@ -255,9 +244,18 @@ st.title("D&D Adventure Game")
 # Character creation form in sidebar
 st.sidebar.subheader("Create your character")
 st.session_state.Name = st.sidebar.text_input("Name", st.session_state.Name)
-st.session_state.Race = st.sidebar.text_input("Race", st.session_state.Race)
-st.session_state.Class = st.sidebar.text_input("Class", st.session_state.Class)
-st.session_state.Background = st.sidebar.text_input("Background", st.session_state.Background)
+st.session_state.Race = st.sidebar.selectbox(
+    "Race",
+    ("Dwarf", "Elf", "Halfling", "Human", "Dragonborn", "Gnome", "Half-Elf", "Half-Orc", "Tiefling"),
+)
+st.session_state.Class = st.sidebar.selectbox(
+    "Class",
+    ("Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"),
+)
+st.session_state.Background = st.sidebar.selectbox(
+    "Background",
+    ("Acolyte", "Charlatan", "Criminal", "Entertainer", "Folk Hero", "Guild Artisan", "Hermit", "Noble", "Outlander", "Sage", "Sailor", "Soldier", "Urchin"),
+)
 st.session_state.Skills = st.sidebar.text_input("Skills", st.session_state.Skills)
 st.session_state.Inventory = st.sidebar.text_input("Inventory", st.session_state.Inventory)
 
