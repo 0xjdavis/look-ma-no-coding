@@ -59,6 +59,9 @@ st.session_state.Class = st.sidebar.text_input("Class", st.session_state.Class)
 st.session_state.Skills = st.sidebar.text_input("Skills", st.session_state.Skills)
 st.session_state.Inventory = st.sidebar.text_input("Inventory", st.session_state.Inventory)
 
+with st.sidebar:
+    display_image_directory())
+
 # Function to roll a d6
 def roll_d6():
     return random.randint(1, 6)
@@ -127,6 +130,25 @@ def generate_and_display_image(message):
                 st.error("No valid image prompt found.")
         except Exception as e:
             st.error(f"Error generating image: {str(e)}")
+
+# Function to list and display images from the /data/images/ directory
+def display_image_directory(directory="data/images"):
+    if not os.path.exists(directory):
+        st.write("The images directory does not exist.")
+        return
+
+    image_files = os.listdir(directory)
+    
+    if len(image_files) == 0:
+        st.write("No images found in the directory.")
+        return
+
+    st.write(f"### Images in `{directory}`:")
+    
+    # Display each image with a link to download or view it
+    for image_file in image_files:
+        image_path = os.path.join(directory, image_file)
+        st.write(f"- [View {image_file}]({image_path})")
 
 # Function to read the story out loud using gTTS (Google Text-to-Speech)
 def read_story_aloud(text):
