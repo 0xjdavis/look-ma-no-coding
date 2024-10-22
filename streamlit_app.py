@@ -142,10 +142,10 @@ def display_image_directory(directory="data/images"):
 
     st.write(f"### Images in `{directory}`:")
     
-    # Display each image with a link to download or view it
+    # Display each image
     for image_file in image_files:
         image_path = os.path.join(directory, image_file)
-        st.write(f"- [View {image_file}]({image_path})")
+        st.image(image_path, caption=image_file, use_column_width=True)
 
 # Function to read the story out loud using gTTS (Google Text-to-Speech)
 def read_story_aloud(text):
