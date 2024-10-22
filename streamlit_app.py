@@ -181,7 +181,11 @@ def is_roll_request(message):
     return '[ROLL THE DICE:' in message
 
 # Streamlit UI
-st.logo("https://preview.redd.it/d-d-logo-feel-free-to-use-for-whatever-v0-swx169zi1e6c1.jpg")
+st.logo(
+    LOGO_URL_LARGE,
+    link="https://preview.redd.it/d-d-logo-feel-free-to-use-for-whatever-v0-swx169zi1e6c1.jpg",
+    icon_image=LOGO_URL_SMALL,
+)
 st.title("D&D Adventure Game")
 
 with st.sidebar:
