@@ -1,5 +1,7 @@
 # 🎈 Roll Playing Game
 
+<a href="https://github.com/0xjdavis/look-ma-no-coding/tree/main"><img src="screenshot.png" /></a>
+
 A simple Streamlit app that mimmics the roll playing game style of Dungeons and Dragons.
 
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://game.streamlit.app/)
@@ -17,4 +19,3 @@ A simple Streamlit app that mimmics the roll playing game style of Dungeons and 
    ```
    $ streamlit run streamlit_app.py
    ```
-[""]("Screenshot")
