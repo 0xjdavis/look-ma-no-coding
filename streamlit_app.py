@@ -1,164 +1,85 @@
 import streamlit as st
-import random
-import os
-import requests
+import random, os, requests
 from openai import OpenAI
-import time
-from gtts import gTTS  # Google Text-to-Speech
+from gtts import gTTS
 from io import BytesIO
 from PIL import Image
 
-# Set API Keys (using st.secrets for Streamlit)
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
-
 client = OpenAI(api_key=OPENAI_API_KEY)
-
-# Define the OpenAI model
 MODEL = 'gpt-4'
 
-# Function to generate the PROMPT based on current form values
-def generate_prompt():
-    return f"""You are a Dungeon Master in a D&D-style adventure game. The player's character is defined as {st.session_state.Class} named {st.session_state.Name} with {st.session_state.Skills} skills and {st.session_state.Inventory}. Guide the player through the story, prompting them to take actions.
+def gen_prompt():
+    return f"""You are a D&D Dungeon Master. Create a story and scene for the player. Player: {st.session_state.Class} {st.session_state.Name}, Skills: {st.session_state.Skills}, Inventory: {st.session_state.Inventory}. Guide the player, prompt for actions.
 
-When presenting action choices to the player, format them as a numbered list like this:
+Present choices as:
 Player action:
-1. [First action option]
-2. [Second action option]
-3. [Third action option]
+1. [Option 1]
+2. [Option 2]
+3. [Option 3]
 
-Provide 2-4 options for each action prompt. The player will respond with their chosen action.
+Provide 2-4 options. Player responds with chosen action.
 
-When a situation requires a skill check or an action with uncertain outcome, explicitly ask the player to roll a d6 (six-sided die). Format your request for a dice roll as follows: '[ROLL THE DICE: reason for rolling]' For example: '[ROLL THE DICE: to see if you successfully track the creature]'
+For skill checks: '[ROLL THE DICE: reason]'
+Interpret roll:
+1-2 = Fail, 3-4 = Partial success, 5-6 = Success
 
-After the player rolls, interpret the result as follows:
-1-2 = Failure
-3-4 = Partial success
-5-6 = Complete success
+Wait for player's roll/choice before continuing.
 
-Wait for the player's roll or action choice before continuing the story.
+End with: [IMAGE: brief scene description]"""
 
-At the end of each response, provide a brief description (1-2 sentences) of the current scene or action for image generation. Format it as: [IMAGE: description for image generation]"""
-
-# Initialize session state
 if 'game_state' not in st.session_state:
     st.session_state.game_state = "not_started"
     st.session_state.messages = []
-    st.session_state.roll_result = None
     st.session_state.current_image = None
 
-# Initialize form values in session state
-if 'Name' not in st.session_state:
-    st.session_state.Name = "Eldar"
-    st.session_state.Class = "Hunter"
-    st.session_state.Skills = "Archer, Tracking, Animal Handling"
-    st.session_state.Inventory = "1 Bow, Quiver of 40 arrows"
+for attr in ['Name', 'Class', 'Skills', 'Inventory']:
+    if attr not in st.session_state:
+        st.session_state[attr] = ""
 
-# Sidebar form
-st.sidebar.title("Create your character")
-st.session_state.Name = st.sidebar.text_input("Name", st.session_state.Name)
-st.session_state.Class = st.sidebar.text_input("Class", st.session_state.Class)
-st.session_state.Skills = st.sidebar.text_input("Skills", st.session_state.Skills)
-st.session_state.Inventory = st.sidebar.text_input("Inventory", st.session_state.Inventory)
+st.sidebar.title("Create character")
+for attr in ['Name', 'Class', 'Skills', 'Inventory']:
+    st.session_state[attr] = st.sidebar.text_input(attr, st.session_state[attr])
 
-# Function to roll a d6
-def roll_d6():
-    return random.randint(1, 6)
+def roll_d6(): return random.randint(1, 6)
 
-# Function to get AI response
-def get_ai_response(messages):
+def get_ai_response(msgs):
     try:
-        response = client.chat.completions.create(
-            model=MODEL,
-            messages=messages
-        )
-        return response.choices[0].message.content
+        return client.chat.completions.create(model=MODEL, messages=msgs).choices[0].message.content
     except Exception as e:
-        st.error(f"An error occurred connecting to OpenAI: {str(e)}")
-        return "I apologize, but I'm having trouble connecting to the AI service at the moment. Maybe go outside."
+        return f"Error connecting to AI: {str(e)}"
 
-# Ensure the directory exists
-if not os.path.exists('data/images'):
-    os.makedirs('data/images')
+if not os.path.exists('data/images'): os.makedirs('data/images')
 
-# Function to generate and save the image locally
-def generate_image(prompt):
+def gen_image(prompt):
     try:
-        full_prompt = f"Create a highly detailed fantasy scene: {prompt}. Include rich, vivid colors, magical elements, and a sense of adventure. Use the fantasy artwork stylings of artist Frank Frazetta as an influence of the images. Create consistant imagery for the entire game. Don't change styles."
-        
-        response = client.images.generate(
-            model="dall-e-3",
-            prompt=full_prompt,
-            size="1024x1024",
-            n=1
-        )
-        image_url = response.data[0].url
-        
-        # Download the image
-        image_response = requests.get(image_url)
-        if image_response.status_code == 200:
-            # Save the image to /data/images/ directory
-            image_path = f"data/images/{prompt.replace(' ', '_')[:50]}.jpg"
-            with open(image_path, 'wb') as f:
-                f.write(image_response.content)
-            return image_path
-        else:
-            st.error("Failed to download the image.")
-            return None
+        full_prompt = f"Detailed fantasy scene: {prompt}. Vivid colors, magical elements, adventure. Frank Frazetta style. Consistent imagery."
+        img_url = client.images.generate(model="dall-e-3", prompt=full_prompt, size="1024x1024", n=1).data[0].url
+        img_resp = requests.get(img_url)
+        if img_resp.status_code == 200:
+            img_path = f"data/images/{prompt.replace(' ', '_')[:50]}.jpg"
+            with open(img_path, 'wb') as f: f.write(img_resp.content)
+            return img_path
     except Exception as e:
-        st.error(f"An error occurred while generating the image: {str(e)}")
-        return None
+        st.error(f"Image generation error: {str(e)}")
+    return None
 
-# Function to extract and display image
-def generate_and_display_image(message):
-    if "[IMAGE:" in message:
-        try:
-            # Extract the image prompt from the message
-            image_prompt = message.split("[IMAGE:")[-1].split("]")[0].strip()
-            
-            if image_prompt:
-                image_url = generate_image(image_prompt)
-                
-                # Check if the image was successfully generated
-                if image_url:
-                    st.session_state.current_image = image_url
-                    st.sidebar.image(image_url, caption=image_url, use_column_width=True)
-                else:
-                    st.error("Failed to generate an image. Please try again.")
-            else:
-                st.error("No valid image prompt found.")
-        except Exception as e:
-            st.error(f"Error generating image: {str(e)}")
- 
-# Function to list and display images from the /data/images/ directory
-def display_image_directory(directory="data/images"):
-    if not os.path.exists(directory):
-        st.sidebar.write("The images directory does not exist.")
-        return
+def gen_and_show_image(msg):
+    if "[IMAGE:" in msg:
+        img_prompt = msg.split("[IMAGE:")[-1].split("]")[0].strip()
+        if img_prompt:
+            img_url = gen_image(img_prompt)
+            if img_url:
+                st.session_state.current_image = img_url
+                st.sidebar.image(img_url, use_column_width=True)
 
-    image_files = os.listdir(directory)
-    
-    if len(image_files) == 0:
-        st.sidebar.write("No images found in the directory.")
-        return
-    
-    #st.write(f"### Images in `{directory}`:")
+def show_image_dir(dir="data/images"):
+    if os.path.exists(dir):
+        for img_file in os.listdir(dir):
+            img_path = os.path.join(dir, img_file)
+            st.sidebar.image(img_path, use_column_width=True)
 
-    image_path = st.query_params.get("data/images/")
-    if image_path:
-        image = Image.open(image_path)
-        st.image(image)
-        
-    # Display each image with a link to open in a new tab
-    for image_file in image_files:
-        image_path = os.path.join(directory, image_file)
-        
-        # Create a relative URL for the image
-        relative_image_path = f"{image_path}"
-        #st.write(relative_image_path)
-        
-        
-# Function to read the story out loud using gTTS (Google Text-to-Speech)
-def read_story_aloud(text):
+def read_aloud(text):
     try:
         tts = gTTS(text, lang='en', tld='us')
         mp3_fp = BytesIO()
@@ -166,74 +87,46 @@ def read_story_aloud(text):
         mp3_fp.seek(0)
         st.audio(mp3_fp, format="audio/mp3")
     except Exception as e:
-        st.error(f"An error occurred while generating audio: {str(e)}")
+        st.error(f"Audio generation error: {str(e)}")
 
-# Display chat history
-def display_chat_history():
-    for message in st.session_state.messages:
-        if message["role"] != "system":
-            with st.chat_message(message["role"]):
-                st.write(message["content"])
-                # Play the audio after each message by the assistant
-                if message["role"] == "assistant":
-                    read_story_aloud(message["content"])
-                    
-# Function to check if AI is requesting a dice roll
-def is_roll_request(message):
-    return '[ROLL THE DICE:' in message
+def show_chat():
+    for msg in st.session_state.messages:
+        if msg["role"] != "system":
+            with st.chat_message(msg["role"]):
+                st.write(msg["content"])
+                if msg["role"] == "assistant": read_aloud(msg["content"])
 
-# Streamlit UI
-#st.logo(
-    #image="dandd.webp",
-    #link="dandd.webp",
-    #icon_image="dandd.webp",
-#)
+def is_roll_req(msg): return '[ROLL THE DICE:' in msg
+
 st.title("D&D Adventure Game")
+with st.sidebar: show_image_dir()
+if st.session_state.current_image: st.sidebar.image(st.session_state.current_image, use_column_width=True)
 
-with st.sidebar:
-    display_image_directory()
-    
-# Display current image
-if st.session_state.current_image:
-    st.sidebar.image(st.session_state.current_image, use_column_width=True)
-
-# Start game button
 if st.session_state.game_state == "not_started":
     if st.button("Start New Adventure"):
         st.session_state.game_state = "playing"
-        initial_prompt = generate_prompt()
-        st.session_state.messages = [{"role": "system", "content": initial_prompt}]
-        st.session_state.messages.append({
-            "role": "user",
-            "content": "Start a new adventure Dungeon Master. Introduce the setting."
-        })
-        ai_message = get_ai_response(st.session_state.messages)
-        generate_and_display_image(ai_message)
-        st.session_state.messages.append({"role": "assistant", "content": ai_message})
+        init_prompt = gen_prompt()
+        st.session_state.messages = [{"role": "system", "content": init_prompt}, {"role": "user", "content": "Start a new adventure. Introduce the setting."}]
+        ai_msg = get_ai_response(st.session_state.messages)
+        gen_and_show_image(ai_msg)
+        st.session_state.messages.append({"role": "assistant", "content": ai_msg})
         st.rerun()
 
-# Main game loop
 if st.session_state.game_state == "playing":
-    display_chat_history()
-
-    # Check if the last message is a roll request
-    if st.session_state.messages and is_roll_request(st.session_state.messages[-1]["content"]):
+    show_chat()
+    if st.session_state.messages and is_roll_req(st.session_state.messages[-1]["content"]):
         if st.button("Roll Dice"):
-            roll_result = roll_d6()
-            roll_message = f"You rolled a {roll_result}."
-            st.session_state.messages.append({"role": "user", "content": roll_message})
-            ai_message = get_ai_response(st.session_state.messages)
-            generate_and_display_image(ai_message)
-            st.session_state.messages.append({"role": "assistant", "content": ai_message})
+            roll = roll_d6()
+            st.session_state.messages.append({"role": "user", "content": f"You rolled a {roll}."})
+            ai_msg = get_ai_response(st.session_state.messages)
+            gen_and_show_image(ai_msg)
+            st.session_state.messages.append({"role": "assistant", "content": ai_msg})
             st.rerun()
     else:
-        # User input
         user_input = st.chat_input("What would you like to do?")
         if user_input:
             st.session_state.messages.append({"role": "user", "content": user_input})
-            ai_message = get_ai_response(st.session_state.messages)
-            generate_and_display_image(ai_message)
-            st.session_state.messages.append({"role": "assistant", "content": ai_message})
+            ai_msg = get_ai_response(st.session_state.messages)
+            gen_and_show_image(ai_msg)
+            st.session_state.messages.append({"role": "assistant", "content": ai_msg})
             st.rerun()
-
-
