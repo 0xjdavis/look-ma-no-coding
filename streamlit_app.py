@@ -248,9 +248,7 @@ if st.session_state.current_image:
 with st.sidebar:
     display_image_directory()
 
-
-# Character creation form in sidebar
-with st.sidebar.subheader("Your character"):
+    st.sidebar.subheader("Your Character"
     # Display health bar in sidebar
     st.sidebar.write(f"Health: {st.session_state.health}/10")
     st.sidebar.progress(st.session_state.health / 10)
