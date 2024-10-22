@@ -156,13 +156,7 @@ def display_image_directory(directory="data/images"):
         # Create a relative URL for the image
         relative_image_path = f"{image_path}"
         
-        # Also display the image directly in Streamlit
-        st.image(relative_image_path, caption=image_file, use_column_width=True)
-        #st.write("actual path: https://yhmv4qorvn6ihshmkpe2fd.streamlit.app/~/+/media/3c30e7907f06096b4f557926a43342c3b2cbf38b9ceca4fdf6d0b2c2.jpg")
-        #st.write(image_path)
-        # Use markdown to create a link that opens the image in a new tab
-        #st.markdown(f'<a href="{relative_image_path}" target="_blank"><small>{image_file}</small></a>', unsafe_allow_html=True)
-
+         
 # Main app
 def main():
     st.title("Image Directory Viewer")
