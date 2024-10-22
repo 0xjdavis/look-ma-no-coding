@@ -139,7 +139,7 @@ def display_image_directory(directory="data/images"):
     
     if len(image_files) == 0:
         st.sidebar.write("No images found in the directory.")
-        return'
+        return
     
     #st.write(f"### Images in `{directory}`:")
 
