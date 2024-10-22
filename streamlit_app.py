@@ -129,6 +129,14 @@ def generate_and_display_image(message):
         except Exception as e:
             st.error(f"Error generating image: {str(e)}")
 
+# Function to generate the correct URL for opening images in a new tab
+def get_media_url(local_path):
+    # Extract the filename from the local path
+    filename = os.path.basename(local_path)
+    # Construct the media URL
+    # Note: You may need to adjust this based on your actual Streamlit app URL structure
+    return f"https://yhmv4qorvn6ihshmkpe2fd.streamlit.app/~/+/media/{filename}"
+
 # Function to list and display images from the /data/images/ directory
 def display_image_directory(directory="data/images"):
     if not os.path.exists(directory):
@@ -141,28 +149,30 @@ def display_image_directory(directory="data/images"):
         st.write("No images found in the directory.")
         return
 
-    #st.write(f"### Images in `{directory}`:")
-
-    image_path = st.query_params.get("data/images/")
-    if image_path:
-        image = Image.open(image_path)
-        st.image(image)
-
-    
     # Display each image with a link to open in a new tab
     for image_file in image_files:
-        image_path = os.path.join(directory, image_file)
+        local_image_path = os.path.join(directory, image_file)
         
-        # Create a relative URL for the image
-        relative_image_path = f"{image_path}"
+        # Generate the media URL for opening in a new tab
+        media_url = get_media_url(local_image_path)
         
-        # Also display the image directly in Streamlit
-        st.image(image_path, caption=image_file, use_column_width=True)
-        #st.write("actual path: https://yhmv4qorvn6ihshmkpe2fd.streamlit.app/~/+/media/3c30e7907f06096b4f557926a43342c3b2cbf38b9ceca4fdf6d0b2c2.jpg")
-        st.write(image_path)
-        # Use markdown to create a link that opens the image in a new tab
-        #st.markdown(f'<a href="{relative_image_path}" target="_blank"><small>{image_file}</small></a>', unsafe_allow_html=True)
+        # Display the image using the local path
+        st.image(local_image_path, caption=image_file, use_column_width=True)
         
+        # Create a link that opens the image in a new tab using the media URL
+        st.markdown(f'<a href="{media_url}" target="_blank">Open {image_file} in new tab</a>', unsafe_allow_html=True)
+        
+        # Optionally, display the local path and media URL for debugging
+        st.write(f"Local path: {local_image_path}")
+        st.write(f"Media URL: {media_url}")
+
+# Main app
+def main():
+    st.title("Image Directory Viewer")
+    display_image_directory()
+
+if __name__ == "__main__":
+    main()
 
 
 # Function to read the story out loud using gTTS (Google Text-to-Speech)
