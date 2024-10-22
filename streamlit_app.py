@@ -160,7 +160,7 @@ def display_image_directory(directory="data/images"):
         st.image(image_path, caption=image_file, use_column_width=True)
         
         # Use markdown to create a link that opens the image in a new tab
-        st.markdown(f'<a href="{relative_image_path}" target="_blank">{image_file}</a>', unsafe_allow_html=True)
+        st.markdown(f'<a href="{relative_image_path}" target="_blank"><small>{image_file}</small></a>', unsafe_allow_html=True)
         
 
 
