@@ -77,7 +77,7 @@ def show_image_dir(dir="data/images"):
     if os.path.exists(dir):
         for img_file in os.listdir(dir):
             img_path = os.path.join(dir, img_file)
-            st.sidebar.image(img_path, use_column_width=True)
+            #st.sidebar.image(img_path, use_column_width=True)
 
 def read_aloud(text):
     try:
