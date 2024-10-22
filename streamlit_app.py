@@ -139,14 +139,14 @@ def display_image_directory(directory="data/images"):
     
     if len(image_files) == 0:
         st.sidebar.write("No images found in the directory.")
-        return
-
+        return'
+    
     #st.write(f"### Images in `{directory}`:")
 
     image_path = st.query_params.get("data/images/")
     if image_path:
         image = Image.open(image_path)
-        st.sidebar.image(image)
+        st.image(image)
         
     # Display each image with a link to open in a new tab
     for image_file in image_files:
@@ -154,7 +154,7 @@ def display_image_directory(directory="data/images"):
         
         # Create a relative URL for the image
         relative_image_path = f"{image_path}"
-        st.write(relative_image_path)
+        #st.write(relative_image_path)
         
         
 # Function to read the story out loud using gTTS (Google Text-to-Speech)
