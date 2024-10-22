@@ -241,7 +241,6 @@ def is_roll_request(message):
 # Streamlit UI
 st.title("D&D Adventure Game")
 
-
 # Display current image
 if st.session_state.current_image:
     st.sidebar.image(st.session_state.current_image, use_column_width=True)
@@ -250,13 +249,12 @@ with st.sidebar:
     display_image_directory()
 
 # Display health bar in sidebar
-st.sidebar.subheader("Character Health")
+st.sidebar.subheader(f"Health: {st.session_state.health}/10")
 st.sidebar.progress(st.session_state.health / 10)
-st.sidebar.write(f"Health: {st.session_state.health}/10")
 
 # Character creation form in sidebar
-with st.expander("Create your character"):
-    st.session_state.Name = st.sidebar.text_input("Name", st.session_state.Name)
+with expander = st.expander("Create your character"):
+    expander.st.session_state.Name = st.sidebar.text_input("Name", st.session_state.Name)
     st.session_state.Race = st.sidebar.selectbox(
         "Race",
         ("Dwarf", "Elf", "Halfling", "Human", "Dragonborn", "Gnome", "Half-Elf", "Half-Orc", "Tiefling"),
