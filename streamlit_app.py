@@ -253,22 +253,22 @@ st.sidebar.subheader(f"Health: {st.session_state.health}/10")
 st.sidebar.progress(st.session_state.health / 10)
 
 # Character creation form in sidebar
-with expander = st.expander("Create your character"):
+with st.expander("Create your character"):
     expander.st.session_state.Name = st.sidebar.text_input("Name", st.session_state.Name)
-    st.session_state.Race = st.sidebar.selectbox(
+    expander.st.session_state.Race = st.sidebar.selectbox(
         "Race",
         ("Dwarf", "Elf", "Halfling", "Human", "Dragonborn", "Gnome", "Half-Elf", "Half-Orc", "Tiefling"),
     )
-    st.session_state.Class = st.sidebar.selectbox(
+    expander.st.session_state.Class = st.sidebar.selectbox(
         "Class",
         ("Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"),
     )
-    st.session_state.Background = st.sidebar.selectbox(
+    expander.st.session_state.Background = st.sidebar.selectbox(
         "Background",
         ("Acolyte", "Charlatan", "Criminal", "Entertainer", "Folk Hero", "Guild Artisan", "Hermit", "Noble", "Outlander", "Sage", "Sailor", "Soldier", "Urchin"),
     )
-    st.session_state.Skills = st.sidebar.text_input("Skills", st.session_state.Skills)
-    st.session_state.Inventory = st.sidebar.text_input("Inventory", st.session_state.Inventory)
+    expander.st.session_state.Skills = st.sidebar.text_input("Skills", st.session_state.Skills)
+    expander.st.session_state.Inventory = st.sidebar.text_input("Inventory", st.session_state.Inventory)
     
 
 # Handle game states
