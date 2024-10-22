@@ -141,7 +141,7 @@ def display_image_directory(directory="data/images"):
         st.write("No images found in the directory.")
         return
 
-    st.write(f"### Images in `{directory}`:")
+    #st.write(f"### Images in `{directory}`:")
 
     image_path = st.query_params.get("data/images/")
     if image_path:
@@ -154,7 +154,7 @@ def display_image_directory(directory="data/images"):
         image_path = os.path.join(directory, image_file)
         
         # Create a relative URL for the image
-        relative_image_path = f"../{image_path}"
+        relative_image_path = f"{image_path}"
         
         # Use markdown to create a link that opens the image in a new tab
         st.markdown(f'<a href="{relative_image_path}" target="_blank">{image_file}</a>', unsafe_allow_html=True)
