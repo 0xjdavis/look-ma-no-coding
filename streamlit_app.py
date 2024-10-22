@@ -121,7 +121,7 @@ def generate_and_display_image(message):
                 # Check if the image was successfully generated
                 if image_url:
                     st.session_state.current_image = image_url
-                    st.image(image_url, caption=image_url, use_column_width=True)
+                    st.sidebar.image(image_url, caption=image_url, use_column_width=True)
                 else:
                     st.error("Failed to generate an image. Please try again.")
             else:
@@ -147,7 +147,6 @@ def display_image_directory(directory="data/images"):
     if image_path:
         image = Image.open(image_path)
         st.sidebar.image(image)
-
     
     # Display each image with a link to open in a new tab
     for image_file in image_files:
@@ -156,9 +155,6 @@ def display_image_directory(directory="data/images"):
         # Create a relative URL for the image
         relative_image_path = f"{image_path}"
         
-         
-
-
 # Function to read the story out loud using gTTS (Google Text-to-Speech)
 def read_story_aloud(text):
     try:
