@@ -59,9 +59,6 @@ st.session_state.Class = st.sidebar.text_input("Class", st.session_state.Class)
 st.session_state.Skills = st.sidebar.text_input("Skills", st.session_state.Skills)
 st.session_state.Inventory = st.sidebar.text_input("Inventory", st.session_state.Inventory)
 
-with st.sidebar:
-    display_image_directory()
-
 # Function to roll a d6
 def roll_d6():
     return random.randint(1, 6)
@@ -179,6 +176,9 @@ def is_roll_request(message):
 # Streamlit UI
 st.title("D&D Adventure Game")
 
+with st.sidebar:
+    display_image_directory()
+    
 # Display current image
 if st.session_state.current_image:
     st.image(st.session_state.current_image, use_column_width=True)
@@ -225,3 +225,4 @@ if st.session_state.game_state == "playing":
             #generate_and_display_image(ai_message)
             #read_story_aloud(ai_message)
             st.rerun()
+            
