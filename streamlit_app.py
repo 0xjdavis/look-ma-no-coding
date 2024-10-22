@@ -142,9 +142,17 @@ def display_image_directory(directory="data/images"):
 
     st.write(f"### Images in `{directory}`:")
     
-    # Display each image
+    # Display each image with a link to open in a new tab
     for image_file in image_files:
         image_path = os.path.join(directory, image_file)
+        
+        # Create a relative URL for the image
+        relative_image_path = f"/{image_path}"
+        
+        # Use markdown to create a link that opens the image in a new tab
+        st.markdown(f'<a href="{relative_image_path}" target="_blank">{image_file}</a>', unsafe_allow_html=True)
+        
+        # Also display the image directly in Streamlit
         st.image(image_path, caption=image_file, use_column_width=True)
 
 # Function to read the story out loud using gTTS (Google Text-to-Speech)
