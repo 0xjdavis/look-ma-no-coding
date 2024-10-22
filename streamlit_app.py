@@ -132,13 +132,13 @@ def generate_and_display_image(message):
 # Function to list and display images from the /data/images/ directory
 def display_image_directory(directory="data/images"):
     if not os.path.exists(directory):
-        st.write("The images directory does not exist.")
+        st.sidebar.write("The images directory does not exist.")
         return
 
     image_files = os.listdir(directory)
     
     if len(image_files) == 0:
-        st.write("No images found in the directory.")
+        st.sidebar.write("No images found in the directory.")
         return
 
     #st.write(f"### Images in `{directory}`:")
@@ -146,7 +146,7 @@ def display_image_directory(directory="data/images"):
     image_path = st.query_params.get("data/images/")
     if image_path:
         image = Image.open(image_path)
-        st.image(image)
+        st.sidebar.image(image)
 
     
     # Display each image with a link to open in a new tab
@@ -159,17 +159,14 @@ def display_image_directory(directory="data/images"):
         # Also display the image directly in Streamlit
         st.image(image_path, caption=image_file, use_column_width=True)
         #st.write("actual path: https://yhmv4qorvn6ihshmkpe2fd.streamlit.app/~/+/media/3c30e7907f06096b4f557926a43342c3b2cbf38b9ceca4fdf6d0b2c2.jpg")
-        st.write(image_path)
+        #st.write(image_path)
         # Use markdown to create a link that opens the image in a new tab
         #st.markdown(f'<a href="{relative_image_path}" target="_blank"><small>{image_file}</small></a>', unsafe_allow_html=True)
 
 # Main app
 def main():
     st.title("Image Directory Viewer")
-    display_image_directory()
 
-if __name__ == "__main__":
-    main()
 
 
 # Function to read the story out loud using gTTS (Google Text-to-Speech)
@@ -245,4 +242,8 @@ if st.session_state.game_state == "playing":
             generate_and_display_image(ai_message)
             st.session_state.messages.append({"role": "assistant", "content": ai_message})
             st.rerun()
-            
+
+
+if __name__ == "__main__":
+    main()
+
