@@ -1,11 +1,10 @@
-
 import streamlit as st
 import random
 import os
 import requests
 from openai import OpenAI
 import time
-from gtts import gTTS  # Google Text-to-Speech
+from gtts import gTTS
 from io import BytesIO
 from PIL import Image
 
@@ -38,7 +37,7 @@ After the player rolls, interpret the result as follows:
 
 Wait for the player's roll or action choice before continuing the story.
 
-At the end of each response, provide a brief description (1-2 sentences) of the current scene or action for image generation. Format it as: [IMAGE: description for image generation]"""
+At the end of each response, provide a brief description (1-2 sentences) of the current scene or action for image generation. Format it as: [IMAGE_PROMPT: description for image generation]"""
 
 # Initialize session state
 if 'game_state' not in st.session_state:
@@ -46,6 +45,7 @@ if 'game_state' not in st.session_state:
     st.session_state.messages = []
     st.session_state.roll_result = None
     st.session_state.current_image = None
+    st.session_state.image_prompt = None
 
 # Initialize form values in session state
 if 'Name' not in st.session_state:
@@ -84,7 +84,7 @@ if not os.path.exists('data/images'):
 # Function to generate and save the image locally
 def generate_image(prompt):
     try:
-        full_prompt = f"Create a highly detailed fantasy scene: {prompt}. Include rich, vivid colors, magical elements, and a sense of adventure. Use the fantasy artwork stylings of artist Frank Frazetta as an influence of the images. Create consistant imagery for the entire game. Don't change styles."
+        full_prompt = f"Create a highly detailed fantasy scene: {prompt}. Include rich, vivid colors, magical elements, and a sense of adventure. Use the fantasy artwork stylings of artist Frank Frazetta as an influence of the images. Create consistent imagery for the entire game. Don't change styles."
         
         response = client.images.generate(
             model="dall-e-3",
@@ -109,12 +109,12 @@ def generate_image(prompt):
         st.error(f"An error occurred while generating the image: {str(e)}")
         return None
 
-# Function to extract and display image
+# Function to extract image prompt and generate image
 def generate_and_display_image(message):
-    if "[IMAGE:" in message:
+    if "[IMAGE_PROMPT:" in message:
         try:
             # Extract the image prompt from the message
-            image_prompt = message.split("[IMAGE:")[-1].split("]")[0].strip()
+            image_prompt = message.split("[IMAGE_PROMPT:")[-1].split("]")[0].strip()
             
             if image_prompt:
                 image_url = generate_image(image_prompt)
@@ -122,14 +122,17 @@ def generate_and_display_image(message):
                 # Check if the image was successfully generated
                 if image_url:
                     st.session_state.current_image = image_url
-                    st.sidebar.image(image_url, caption=image_url, use_column_width=True)
+                    st.sidebar.image(image_url, caption="Current Scene", use_column_width=True)
                 else:
                     st.error("Failed to generate an image. Please try again.")
             else:
                 st.error("No valid image prompt found.")
         except Exception as e:
             st.error(f"Error generating image: {str(e)}")
- 
+    
+    # Remove the image prompt from the message
+    return message.split("[IMAGE_PROMPT:")[0].strip()
+
 # Function to list and display images from the /data/images/ directory
 def display_image_directory(directory="data/images"):
     if not os.path.exists(directory):
@@ -141,22 +144,12 @@ def display_image_directory(directory="data/images"):
     if len(image_files) == 0:
         st.sidebar.write("No images found in the directory.")
         return
-    
-    #st.write(f"### Images in `{directory}`:")
 
     image_path = st.query_params.get("data/images/")
     if image_path:
         image = Image.open(image_path)
         st.image(image)
-        
-    # Display each image with a link to open in a new tab
-    for image_file in image_files:
-        image_path = os.path.join(directory, image_file)
-        
-        # Create a relative URL for the image
-        relative_image_path = f"{image_path}"
-        #st.write(relative_image_path)
-        
+
 # Function to read the story out loud using gTTS (Google Text-to-Speech)
 def read_story_aloud(text):
     try:
@@ -177,22 +170,17 @@ def display_chat_history():
                 # Play the audio after each message by the assistant
                 if message["role"] == "assistant":
                     read_story_aloud(message["content"])
-                    
+
 # Function to check if AI is requesting a dice roll
 def is_roll_request(message):
     return '[ROLL THE DICE:' in message
 
 # Streamlit UI
-#st.logo(
-    #image="dandd.webp",
-    #link="dandd.webp",
-    #icon_image="dandd.webp",
-#)
 st.title("D&D Adventure Game")
 
 with st.sidebar:
     display_image_directory()
-    
+
 # Display current image
 if st.session_state.current_image:
     st.sidebar.image(st.session_state.current_image, use_column_width=True)
@@ -208,8 +196,8 @@ if st.session_state.game_state == "not_started":
             "content": "Start a new adventure Dungeon Master. Introduce the characters and setting."
         })
         ai_message = get_ai_response(st.session_state.messages)
-        generate_and_display_image(ai_message)
-        st.session_state.messages.append({"role": "assistant", "content": ai_message})
+        cleaned_message = generate_and_display_image(ai_message)
+        st.session_state.messages.append({"role": "assistant", "content": cleaned_message})
         st.rerun()
 
 # Main game loop
@@ -223,8 +211,8 @@ if st.session_state.game_state == "playing":
             roll_message = f"You rolled a {roll_result}."
             st.session_state.messages.append({"role": "user", "content": roll_message})
             ai_message = get_ai_response(st.session_state.messages)
-            generate_and_display_image(ai_message)
-            st.session_state.messages.append({"role": "assistant", "content": ai_message})
+            cleaned_message = generate_and_display_image(ai_message)
+            st.session_state.messages.append({"role": "assistant", "content": cleaned_message})
             st.rerun()
     else:
         # User input
@@ -232,6 +220,6 @@ if st.session_state.game_state == "playing":
         if user_input:
             st.session_state.messages.append({"role": "user", "content": user_input})
             ai_message = get_ai_response(st.session_state.messages)
-            generate_and_display_image(ai_message)
-            st.session_state.messages.append({"role": "assistant", "content": ai_message})
+            cleaned_message = generate_and_display_image(ai_message)
+            st.session_state.messages.append({"role": "assistant", "content": cleaned_message})
             st.rerun()
